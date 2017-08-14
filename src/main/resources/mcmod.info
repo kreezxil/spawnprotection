@@ -1,0 +1,16 @@
+[
+{
+  "modid": "spawnprotection",
+  "name": "Spawn Protection",
+  "description": "Protecting spawn regardless of the op condition",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authorList": ["Kreezxil"],
+  "credits": "Mojang for making Spawn Protection by default worthless on servers.",
+  "logoFile": "",
+  "screenshots": [],
+  "dependencies": []
+}
+]
