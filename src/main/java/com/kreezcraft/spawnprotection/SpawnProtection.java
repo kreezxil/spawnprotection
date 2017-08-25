@@ -22,7 +22,7 @@ public class SpawnProtection
 {
     public static final String MODID = "spawnprotection";
     public static final String NAME = "Spawn Protection";
-    public static final String VERSION = "1.12.1-1.7";
+    public static final String VERSION = "1.11.2-1.1.10";
     
     @SidedProxy(clientSide = "com.kreezcraft.spawnprotection.ClientProxy", serverSide = "com.kreezcraft.spawnprotection.ServerProxy")
     public static CommonProxy proxy;

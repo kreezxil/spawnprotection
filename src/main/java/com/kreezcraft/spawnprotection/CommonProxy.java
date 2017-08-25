@@ -137,6 +137,9 @@ public class CommonProxy {
 
 			if (event.isCancelable()) {
 				if (block != null && block != player) {
+					if(event instanceof PlayerInteractEvent.LeftClickBlock) {
+						event.setCanceled(true); //don't be harvesting circuits things that are being checked for below
+					}
 					if (block.canProvidePower() && Config.allowCircuits) {
 						// button, lever
 						return null;
