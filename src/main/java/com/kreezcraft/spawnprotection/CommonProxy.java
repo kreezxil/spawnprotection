@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
 import net.minecraftforge.event.world.GetCollisionBoxesEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -121,43 +122,68 @@ public class CommonProxy {
 				pz > wz + Config.spawnProtection || 
 				px < wx - Config.spawnProtection || 
 				pz < wz - Config.spawnProtection) {
+			//player is outside the spawn protected area
 			return event;
-		} else {
-			// is the player in creative or an operator?
-			if (player.isCreative()) {
-				return null;
-			}
-			// is it a real server?
-			if (server != null && !server.isSinglePlayer()) {
-				if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
-					// player is op
-					return null;
-				}
-			}
-
-			if (event.isCancelable()) {
-				if (block != null && block != player) {
-					if(event instanceof PlayerInteractEvent.LeftClickBlock) {
-						event.setCanceled(true); //don't be harvesting circuits things that are being checked for below
-					}
-					if (block.canProvidePower() && Config.allowCircuits) {
-						// button, lever
-						return null;
-					}
-					if (block.hasComparatorInputOverride() && Config.allowContainers) {
-						// containers
-						return null;
-					}
-					if (block.getProperties().containsKey(OPEN) && Config.allowDoors) {
-						// door, trapdoor
-						return null;
-					}
-				}
-
-				event.setCanceled(true);
-			}
+		} 
+		
+		// is the player in creative or an operator?
+		if (player.isCreative()) {
 			return null;
 		}
+		// is it a real server?
+		if (server != null && !server.isSinglePlayer()) {
+			if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
+				// player is op
+				return null;
+			}
+		}
+
+		//is the event something that I can actually do something with?
+		if (event.isCancelable()) {
+			//does the block value contain something that I can test and is the block being intereacted upon not the player
+			if (block != null && block != player) {
+				//no left clicking!
+				if(event instanceof PlayerInteractEvent.LeftClickBlock) {
+					event.setCanceled(true); //don't be harvesting circuits things that are being checked for below
+				}
+				
+				//is it a button or lever?
+				if (block.canProvidePower()) {
+					//are you we allowed to do use them
+					if ( Config.allowCircuits) {
+						return null;
+					}
+				}
+				
+				//is the block a container?
+				if (block.hasComparatorInputOverride()) {
+					//are we allowed to use them?
+					if (Config.allowContainers) {
+						return null;
+					}
+				}
+				
+				//is it a door?
+				if (block.getProperties().containsKey(OPEN)) {
+					//are we allowed to use doors?
+					if (Config.allowDoors) {
+						return null;
+					}
+				}
+				
+				//make sure it's not a right click event and if it is let it pass
+				if(event instanceof RightClickItem) {
+					return event;
+				}
+				//if we got here then the event should be canceled
+				event.setCanceled(true);
+			}
+			//let something else process the event
+			return event;
+		}
+		
+		return null;
+		
 	}
 	
 	//the following causes intense lag!
