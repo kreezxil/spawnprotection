@@ -20,6 +20,8 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
@@ -49,6 +51,7 @@ public class CommonProxy {
     }
     
 	@SubscribeEvent
+	@SideOnly(Side.SERVER)
 	public static PlayerInteractEvent escapingSpawn(PlayerInteractEvent event) {
 
 		//SpawnProtection.logger.debug(event.toString());
@@ -185,108 +188,6 @@ public class CommonProxy {
 		return null;
 		
 	}
-	
-	//the following causes intense lag!
-//	@SubscribeEvent
-//	public static GetCollisionBoxesEvent escapingSpawn(GetCollisionBoxesEvent event) {
-//
-//		SpawnProtection.logger.debug(event.toString());
-//
-//		EntityPlayer player;
-//		if(event.getEntity() instanceof EntityPlayer) {
-//			player = (EntityPlayer) event.getEntity();
-//		} else {
-//			return event; //get out of here
-//		}
-//
-//		World world = player.getEntityWorld();
-//
-//		MinecraftServer server = player.getServer();
-//
-//		int px, pz, wx, wz;
-//
-//		int worldId = world.provider.getDimension();
-//
-//		/*
-//		 * Actually it's not the player I need the check but the block with which they
-//		 * are interacting. Previously this was player.getPosition().getX() etc just so
-//		 * you know
-//		 * 
-//		 * What the javadoc says is that event's getPos, will return the position of the
-//		 * thing being acted upon. And should there be no thing, then the player becomes
-//		 * the thing.
-//		 * 
-//		 * Therefore it should be a more accurate representation of any player trying to
-//		 * much around within the protected area.
-//		 * 
-//		 * -- Kreezxil 15 Aug, 2017
-//		 */
-//		px = player.getPosition().getX();
-//		pz = player.getPosition().getZ();
-//		wx = world.getSpawnPoint().getX();
-//		wz = world.getSpawnPoint().getZ();
-//
-//		IBlockState block = world.getBlockState(player.getPosition());
-//
-//		// if the dimension that the player is in not configured for true, this will
-//		// exit
-//		// and allow them to edit the dimension spawn.
-//		switch (worldId) {
-//
-//		// overWorld
-//		case 0:
-//			if (!Config.overWorld) {
-//				return null;
-//			}
-//			break;
-//
-//		// Nether
-//		case -1:
-//			if (!Config.theNether) {
-//				return null;
-//			}
-//			break;
-//
-//		// The End
-//		case 1:
-//			if (!Config.theEnd) {
-//				return null;
-//			}
-//			break;
-//
-//		// Some other dimensions definitely return null
-//		default:
-//			return null;
-//		}
-//
-//		if (px > wx + Config.spawnProtection || pz > wz + Config.spawnProtection || px < wx - Config.spawnProtection
-//				|| pz < wz - Config.spawnProtection) {
-//			return event;
-//		} else {
-//			// is the player in creative or an operator?
-//			if (player.isCreative()) {
-//				return null;
-//			}
-//			// is it a real server?
-//			if (server != null && !server.isSinglePlayer()) {
-//				if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
-//					// player is op
-//					return null;
-//				}
-//			}
-//
-//			if (event.isCancelable()) {
-//				if (block != null && block != player) {
-//					if (block.canProvidePower() && Config.allowCircuits) {
-//						//pressure plate
-//						return null;
-//					}
-//				}
-//
-//				event.setCanceled(true);
-//			}
-//			return null;
-//		}
-//	}
+
 }
 

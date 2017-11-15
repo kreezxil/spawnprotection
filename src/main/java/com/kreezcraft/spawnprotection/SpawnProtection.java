@@ -4,10 +4,6 @@ package com.kreezcraft.spawnprotection;
 
 import org.apache.logging.log4j.Logger;
 
-import com.kreezcraft.spawnprotection.commands.CommandSpawnProtect;
-import com.kreezcraft.spawnprotection.commands.spawnprotectSubCommands.CommandAllow;
-import com.kreezcraft.spawnprotection.commands.spawnprotectSubCommands.CommandDimension;
-import com.kreezcraft.spawnprotection.commands.spawnprotectSubCommands.CommandRadius;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
@@ -17,12 +13,15 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 
-@Mod(modid = SpawnProtection.MODID, version = SpawnProtection.VERSION, name = SpawnProtection.NAME)
+@Mod(modid = SpawnProtection.MODID, 
+	version = SpawnProtection.VERSION, 
+	name = SpawnProtection.NAME,
+	acceptableRemoteVersions = "*")
 public class SpawnProtection
 {
     public static final String MODID = "spawnprotection";
     public static final String NAME = "Spawn Protection";
-    public static final String VERSION = "1.11.2-1.1.10";
+    public static final String VERSION = "1.11.2-1.2.15";
     
     @SidedProxy(clientSide = "com.kreezcraft.spawnprotection.ClientProxy", serverSide = "com.kreezcraft.spawnprotection.ServerProxy")
     public static CommonProxy proxy;
