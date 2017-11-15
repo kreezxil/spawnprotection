@@ -6,23 +6,13 @@ import net.minecraftforge.common.config.Configuration;
 
 public class Config {
 
-    public static Configuration cfg = CommonProxy.config;
+    public static Configuration cfg = ServerProxy.config;
 
     private static final String CATEGORY_PROTECTION = "protection";
     private static final String CATEGORY_DIMENSIONS = "dimensions";
     private static final String CATEGORY_INTERACTION = "interaction";
    
     
-    // This values below you can access elsewhere in your mod:
-//    public static int spawnProtection = 16; //default value
-//    public static boolean overWorld = true;
-//    public static boolean theNether = false;
-//    public static boolean theEnd = false;
-//    
-//    public static boolean allowDoors = true;
-//    public static boolean allowCircuits = true;
-//    public static boolean allowContainers = true;
-
     public static int spawnProtection; //default value
     public static boolean overWorld;
     public static boolean theNether;
