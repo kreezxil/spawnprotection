@@ -21,6 +21,8 @@ public class Config {
     public static boolean allowDoors;
     public static boolean allowCircuits;
     public static boolean allowContainers;
+    public static boolean allowRightClickBlock;
+    public static boolean allowRightClickItem;
 
     // Call this from CommonProxy.preInit(). It will create our config if it doesn't
     // exist yet and read the values if it does exist.
@@ -52,6 +54,8 @@ public class Config {
         allowDoors = cfg.getBoolean("allowDoors", CATEGORY_INTERACTION, true, "If true the player can open doors, trap doors, and gates.");
         allowCircuits = cfg.getBoolean("allowCircuits", CATEGORY_INTERACTION, true, "If true the player can press buttons & flip levers.");
         allowContainers = cfg.getBoolean("allowContainers", CATEGORY_INTERACTION, true, "If true the player can open items that are also containers or give a valid output when combined with comparators.");
+        allowRightClickBlock = cfg.getBoolean("allowRightClickBlock", CATEGORY_INTERACTION, true, "If true the player can right click on blocks in the area for interaction.");
+        allowRightClickItem = cfg.getBoolean("allowRightClickItem", CATEGORY_INTERACTION, true, "If true the player can right click on items in their hand for interaction.");
     }
 
 }

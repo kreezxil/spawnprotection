@@ -13,6 +13,7 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
 import net.minecraftforge.event.world.GetCollisionBoxesEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -174,10 +175,22 @@ public class CommonProxy {
 					}
 				}
 				
-				//make sure it's not a right click event and if it is let it pass
-				if(event instanceof RightClickItem) {
-					return event;
+				//is it some other block?
+				if (event instanceof RightClickBlock) {
+					//are we allowed to right click other blocks?
+					if (Config.allowRightClickBlock) {
+						return null;
+					}
 				}
+				
+				//is it an item in the hand?
+				if(event instanceof RightClickItem ) {
+					//are we allowed to right click items in our hands?
+					if (Config.allowRightClickItem) {
+						return null;
+					}
+				}
+				
 				//if we got here then the event should be canceled
 				event.setCanceled(true);
 			}
