@@ -5,15 +5,19 @@ import java.io.File;
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
+import net.minecraftforge.event.world.BlockEvent;
 import net.minecraftforge.event.world.GetCollisionBoxesEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -49,12 +53,82 @@ public class CommonProxy {
     @SubscribeEvent
     public static void registerItems(RegistryEvent.Register<Item> event) {
     }
+
+    /*
+     * there are two methods following each with duplicate code
+     * i like to use a function to reduce the code complexity
+     * kreezxil 11/16/2017
+     */
+    
+    @SubscribeEvent
+    @SideOnly(Side.SERVER)
+    public static BlockEvent thoseDarnBlocks(BlockEvent event) {
+    	
+    	int px,pz,wx,wz;
+    	
+    	World world = event.getWorld();
+
+    	//    	EntityPlayer player = event.getWorld().getClosestPlayer(event.getPos().getX(), event.getPos().getY(), event.getPos().getZ(), 1, false);
+    	
+    	Block theBlock = event.getState().getBlock();
+    	// bet these two are the same
+		IBlockState block = world.getBlockState(event.getPos());
+    	
+    	int worldId = world.provider.getDimension();
+		px = event.getPos().getX();
+		pz = event.getPos().getZ();
+		wx = world.getSpawnPoint().getX();
+		wz = world.getSpawnPoint().getZ();
+
+		switch (worldId) {
+
+		// overWorld
+		case 0:
+			if (!Config.overWorld) {
+				return null;
+			}
+			break;
+
+		// Nether
+		case -1:
+			if (!Config.theNether) {
+				return null;
+			}
+			break;
+
+		// The End
+		case 1:
+			if (!Config.theEnd) {
+				return null;
+			}
+			break;
+
+		// Some other dimensions definitely return null
+		default:
+			return null;
+		}
+
+		if (    px > wx + Config.spawnProtection || 
+				pz > wz + Config.spawnProtection || 
+				px < wx - Config.spawnProtection || 
+				pz < wz - Config.spawnProtection) {
+			//player is outside the spawn protected area
+			return event;
+		} 
+
+    	if(Config.allowPlaceBlock) {
+    		return event;
+    	} 
+
+    	event.setCanceled(true);
+//    	player.entityDropItem(new ItemStack(Item.getItemFromBlock(block.getBlock())), 1);
+    	return event;
+    	
+    }
     
 	@SubscribeEvent
 	@SideOnly(Side.SERVER)
 	public static PlayerInteractEvent escapingSpawn(PlayerInteractEvent event) {
-
-		//SpawnProtection.logger.debug(event.toString());
 
 		EntityPlayer player = event.getEntityPlayer();
 
@@ -174,10 +248,22 @@ public class CommonProxy {
 					}
 				}
 				
-				//make sure it's not a right click event and if it is let it pass
-				if(event instanceof RightClickItem) {
-					return event;
+				//is it some other block?
+				if (event instanceof RightClickBlock) {
+					//are we allowed to right click other blocks?
+					if (Config.allowRightClickBlock) {
+						return null;
+					}
 				}
+				
+				//is it an item in the hand?
+				if(event instanceof RightClickItem ) {
+					//are we allowed to right click items in our hands?
+					if (Config.allowRightClickItem) {
+						return null;
+					}
+				}
+				
 				//if we got here then the event should be canceled
 				event.setCanceled(true);
 			}

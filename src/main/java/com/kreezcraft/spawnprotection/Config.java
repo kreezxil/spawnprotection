@@ -21,6 +21,9 @@ public class Config {
     public static boolean allowDoors;
     public static boolean allowCircuits;
     public static boolean allowContainers;
+    public static boolean allowRightClickBlock;
+    public static boolean allowRightClickItem;
+    public static boolean allowPlaceBlock;
 
     // Call this from CommonProxy.preInit(). It will create our config if it doesn't
     // exist yet and read the values if it does exist.
@@ -52,6 +55,9 @@ public class Config {
         allowDoors = cfg.getBoolean("allowDoors", CATEGORY_INTERACTION, true, "If true the player can open doors, trap doors, and gates.");
         allowCircuits = cfg.getBoolean("allowCircuits", CATEGORY_INTERACTION, true, "If true the player can press buttons & flip levers.");
         allowContainers = cfg.getBoolean("allowContainers", CATEGORY_INTERACTION, true, "If true the player can open items that are also containers or give a valid output when combined with comparators.");
+        allowRightClickBlock = cfg.getBoolean("allowRightClickBlock", CATEGORY_INTERACTION, true, "If true the player can right click on blocks in the area for interaction.");
+        allowRightClickItem = cfg.getBoolean("allowRightClickItem", CATEGORY_INTERACTION, true, "If true the player can right click on items in their hand for interaction.");
+        allowPlaceBlock = cfg.getBoolean("allowPlaceBlock", CATEGORY_INTERACTION, true, "If true the player can place blocks. If false they can not and further it will eat their blocks. You might want to warn them about that. Also I'm working on it.");
     }
 
 }
