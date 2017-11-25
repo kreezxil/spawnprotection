@@ -16,7 +16,8 @@ import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 @Mod(modid = SpawnProtection.MODID, 
 	version = SpawnProtection.VERSION, 
 	name = SpawnProtection.NAME,
-	acceptableRemoteVersions = "*")
+	acceptableRemoteVersions = "*",
+	acceptedMinecraftVersions = "[1.11.2,1.13)")
 public class SpawnProtection
 {
     public static final String MODID = "spawnprotection";
