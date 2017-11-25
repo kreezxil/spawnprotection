@@ -119,8 +119,10 @@ public class CommonProxy {
     	if(Config.allowPlaceBlock) {
     		return event;
     	} 
-
-    	event.setCanceled(true);
+    	
+    	if(event.isCancelable()) {
+    		event.setCanceled(true);
+    	}
 //    	player.entityDropItem(new ItemStack(Item.getItemFromBlock(block.getBlock())), 1);
     	return event;
     	
@@ -221,7 +223,10 @@ public class CommonProxy {
 			if (block != null && block != player) {
 				//no left clicking!
 				if(event instanceof PlayerInteractEvent.LeftClickBlock) {
-					event.setCanceled(true); //don't be harvesting circuits things that are being checked for below
+					if(event.isCancelable()) {
+						event.setCanceled(true); //don't be harvesting circuits things that are being checked for below
+						return event;
+					}
 				}
 				
 				//is it a button or lever?
@@ -265,7 +270,9 @@ public class CommonProxy {
 				}
 				
 				//if we got here then the event should be canceled
-				event.setCanceled(true);
+				if(event.isCancelable()) {
+					event.setCanceled(true);
+				}
 			}
 			//let something else process the event
 			return event;
