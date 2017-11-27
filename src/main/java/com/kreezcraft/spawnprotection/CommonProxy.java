@@ -85,27 +85,27 @@ public class CommonProxy {
 		// overWorld
 		case 0:
 			if (!Config.overWorld) {
-				return null;
+				return event;
 			}
 			break;
 
 		// Nether
 		case -1:
 			if (!Config.theNether) {
-				return null;
+				return event;
 			}
 			break;
 
 		// The End
 		case 1:
 			if (!Config.theEnd) {
-				return null;
+				return event;
 			}
 			break;
 
 		// Some other dimensions definitely return null
 		default:
-			return null;
+			return event;
 		}
 
 		if (    px > wx + Config.spawnProtection || 
@@ -174,27 +174,27 @@ public class CommonProxy {
 		// overWorld
 		case 0:
 			if (!Config.overWorld) {
-				return null;
+				return event;
 			}
 			break;
 
 		// Nether
 		case -1:
 			if (!Config.theNether) {
-				return null;
+				return event;
 			}
 			break;
 
 		// The End
 		case 1:
 			if (!Config.theEnd) {
-				return null;
+				return event;
 			}
 			break;
 
 		// Some other dimensions definitely return null
 		default:
-			return null;
+			return event;
 		}
 
 		if (    px > wx + Config.spawnProtection || 
@@ -207,13 +207,13 @@ public class CommonProxy {
 		
 		// is the player in creative or an operator?
 		if (player.isCreative()) {
-			return null;
+			return event;
 		}
 		// is it a real server?
 		if (server != null && !server.isSinglePlayer()) {
 			if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
 				// player is op
-				return null;
+				return event;
 			}
 		}
 
@@ -233,7 +233,7 @@ public class CommonProxy {
 				if (block.canProvidePower()) {
 					//are you we allowed to do use them
 					if ( Config.allowCircuits) {
-						return null;
+						return event;
 					}
 				}
 				
@@ -241,7 +241,7 @@ public class CommonProxy {
 				if (block.hasComparatorInputOverride()) {
 					//are we allowed to use them?
 					if (Config.allowContainers) {
-						return null;
+						return event;
 					}
 				}
 				
@@ -249,7 +249,7 @@ public class CommonProxy {
 				if (block.getProperties().containsKey(OPEN)) {
 					//are we allowed to use doors?
 					if (Config.allowDoors) {
-						return null;
+						return event;
 					}
 				}
 				
@@ -257,7 +257,7 @@ public class CommonProxy {
 				if (event instanceof RightClickBlock) {
 					//are we allowed to right click other blocks?
 					if (Config.allowRightClickBlock) {
-						return null;
+						return event;
 					}
 				}
 				
@@ -265,7 +265,7 @@ public class CommonProxy {
 				if(event instanceof RightClickItem ) {
 					//are we allowed to right click items in our hands?
 					if (Config.allowRightClickItem) {
-						return null;
+						return event;
 					}
 				}
 				
@@ -274,11 +274,10 @@ public class CommonProxy {
 					event.setCanceled(true);
 				}
 			}
-			//let something else process the event
-			return event;
 		}
 		
-		return null;
+		//let something else process the event
+		return event;
 		
 	}
 
