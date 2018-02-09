@@ -44,7 +44,15 @@ public class SpawnProtection {
 		proxy.postInit(e);
 	}
 
-	// commands still baffle me!!!! and I don't know why!
+	/*
+	 * I'm having problems using the commands to force the values to update that
+	 * control the mod, its as if the config loads from the file in a static form
+	 * and becomes unmutable so what then is cfg.save() even good for if it won't
+	 * overwrite the config file. I'll have to research this later. For now, the mod
+	 * is working much better than it was before.
+	 * 
+	 * Kreezxil 2/9/2018
+	 */
 	// @Mod.EventHandler
 	// public void serverLoad(FMLServerStartingEvent event) {
 	//
