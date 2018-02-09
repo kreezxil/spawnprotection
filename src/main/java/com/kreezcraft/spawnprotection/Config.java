@@ -12,6 +12,7 @@ public class Config {
     private static final String CATEGORY_DIMENSIONS = "dimensions";
     private static final String CATEGORY_INTERACTION = "interaction";
    
+    public static boolean debugMode;
     
     public static int spawnProtection; //default value
     public static boolean overWorld;
@@ -43,7 +44,7 @@ public class Config {
     private static void initGeneralConfig(Configuration cfg) {
         cfg.addCustomCategoryComment(CATEGORY_PROTECTION, "Protection Configuration");
         spawnProtection = cfg.getInt("spawn_protection", CATEGORY_PROTECTION, 16, 0, 10000, "Set op-less spawn protection radius with a range of 0 thru 10,000");
- 
+        debugMode = cfg.getBoolean("debugMode", CATEGORY_PROTECTION, false, "If true it will print messages to the player based on what you are doing in the protected zone, useful for helping Kreezxil debug the mod");
         //The dimensions. By default the Nether and The End are false.
         cfg.addCustomCategoryComment(CATEGORY_DIMENSIONS, "Dimension Configuration");
         overWorld = cfg.getBoolean("OverWorld", CATEGORY_DIMENSIONS, true, "If true the Overworld spawn will be protected");

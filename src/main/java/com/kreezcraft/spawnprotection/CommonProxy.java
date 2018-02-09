@@ -11,6 +11,7 @@ import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
@@ -29,52 +30,55 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
-    public static Configuration config;
+	public static Configuration config;
 
 	public void preInit(FMLPreInitializationEvent e) {
-        File directory = e.getModConfigurationDirectory();
-        config = new Configuration(new File(directory.getPath(), "spawnprotection.cfg"));
-        Config.readConfig();
-    }
+		File directory = e.getModConfigurationDirectory();
+		config = new Configuration(new File(directory.getPath(), "spawnprotection.cfg"));
+		Config.readConfig();
+	}
 
-    public void init(FMLInitializationEvent e) {
-    }
+	public void init(FMLInitializationEvent e) {
+	}
 
-    public void postInit(FMLPostInitializationEvent e) {
-        if (config.hasChanged()) {
-            config.save();
-        }
-   }
+	public void postInit(FMLPostInitializationEvent e) {
+		if (config.hasChanged()) {
+			config.save();
+		}
+	}
 
-    @SubscribeEvent
-    public static void registerBlocks(RegistryEvent.Register<Block> event) {
-    }
+	@SubscribeEvent
+	public static void registerBlocks(RegistryEvent.Register<Block> event) {
+	}
 
-    @SubscribeEvent
-    public static void registerItems(RegistryEvent.Register<Item> event) {
-    }
+	@SubscribeEvent
+	public static void registerItems(RegistryEvent.Register<Item> event) {
+	}
 
-    /*
-     * there are two methods following each with duplicate code
-     * i like to use a function to reduce the code complexity
-     * kreezxil 11/16/2017
-     */
-    
-    @SubscribeEvent
-    @SideOnly(Side.SERVER)
-    public static BlockEvent thoseDarnBlocks(BlockEvent event) {
-    	
-    	int px,pz,wx,wz;
-    	
-    	World world = event.getWorld();
+	/*
+	 * there are two methods following each with duplicate code i world like to use
+	 * a function to reduce the code complexity kreezxil 11/16/2017
+	 */
 
-    	//    	EntityPlayer player = event.getWorld().getClosestPlayer(event.getPos().getX(), event.getPos().getY(), event.getPos().getZ(), 1, false);
-    	
-    	Block theBlock = event.getState().getBlock();
-    	// bet these two are the same
+	@SubscribeEvent
+	@SideOnly(Side.SERVER)
+	public static BlockEvent thoseDarnBlocks(BlockEvent event) {
+
+		int px, pz, wx, wz;
+
+		boolean cancelIt = true;
+
+		World world = event.getWorld();
+		MinecraftServer server = world.getMinecraftServer();
+
+		EntityPlayer player = event.getWorld().getClosestPlayer(event.getPos().getX(), event.getPos().getY(),
+				event.getPos().getZ(), 1, false);
+
+		Block theBlock = event.getState().getBlock();
+		// bet these two are the same
 		IBlockState block = world.getBlockState(event.getPos());
-    	
-    	int worldId = world.provider.getDimension();
+
+		int worldId = world.provider.getDimension();
 		px = event.getPos().getX();
 		pz = event.getPos().getZ();
 		wx = world.getSpawnPoint().getX();
@@ -108,26 +112,47 @@ public class CommonProxy {
 			return event;
 		}
 
-		if (    px > wx + Config.spawnProtection || 
-				pz > wz + Config.spawnProtection || 
-				px < wx - Config.spawnProtection || 
-				pz < wz - Config.spawnProtection) {
-			//player is outside the spawn protected area
+		if (px > wx + Config.spawnProtection || pz > wz + Config.spawnProtection || px < wx - Config.spawnProtection
+				|| pz < wz - Config.spawnProtection) {
+			// player is outside the spawn protected area
 			return event;
-		} 
+		}
 
-    	if(Config.allowPlaceBlock) {
-    		return event;
-    	} 
-    	
-    	if(event.isCancelable()) {
-    		event.setCanceled(true);
-    	}
-//    	player.entityDropItem(new ItemStack(Item.getItemFromBlock(block.getBlock())), 1);
-    	return event;
-    	
-    }
-    
+		// is the player in creative or an operator?
+		if (player != null && player.isCreative()) {
+			return event;
+		}
+
+		// is it a real server?
+		if (server != null && !server.isSinglePlayer() && player != null) {
+
+			if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
+				// player is op
+				return event;
+			}
+
+		}
+
+		if (Config.allowPlaceBlock) {
+			return event;
+		}
+
+		// after this point what we are saying is that Config.allowPlaceBlock is
+		// false!!!
+
+		if (event.isCancelable()) {
+			event.setCanceled(true); // just try to be nice first
+		} else {
+			return null; // the bullheaded way to cancel the event
+		}
+
+		// player.entityDropItem(new ItemStack(Item.getItemFromBlock(block.getBlock())),
+		// 1);
+
+		return event; // yay, the proper way!
+
+	}
+
 	@SubscribeEvent
 	@SideOnly(Side.SERVER)
 	public static PlayerInteractEvent escapingSpawn(PlayerInteractEvent event) {
@@ -197,14 +222,12 @@ public class CommonProxy {
 			return event;
 		}
 
-		if (    px > wx + Config.spawnProtection || 
-				pz > wz + Config.spawnProtection || 
-				px < wx - Config.spawnProtection || 
-				pz < wz - Config.spawnProtection) {
-			//player is outside the spawn protected area
+		if (px > wx + Config.spawnProtection || pz > wz + Config.spawnProtection || px < wx - Config.spawnProtection
+				|| pz < wz - Config.spawnProtection) {
+			// player is outside the spawn protected area
 			return event;
-		} 
-		
+		}
+
 		// is the player in creative or an operator?
 		if (player.isCreative()) {
 			return event;
@@ -217,69 +240,116 @@ public class CommonProxy {
 			}
 		}
 
-		//is the event something that I can actually do something with?
-		if (event.isCancelable()) {
-			//does the block value contain something that I can test and is the block being intereacted upon not the player
-			if (block != null && block != player) {
-				//no left clicking!
-				if(event instanceof PlayerInteractEvent.LeftClickBlock) {
-					if(event.isCancelable()) {
-						event.setCanceled(true); //don't be harvesting circuits things that are being checked for below
-						return event;
-					}
-				}
-				
-				//is it a button or lever?
-				if (block.canProvidePower()) {
-					//are you we allowed to do use them
-					if ( Config.allowCircuits) {
-						return event;
-					}
-				}
-				
-				//is the block a container?
-				if (block.hasComparatorInputOverride()) {
-					//are we allowed to use them?
-					if (Config.allowContainers) {
-						return event;
-					}
-				}
-				
-				//is it a door?
-				if (block.getProperties().containsKey(OPEN)) {
-					//are we allowed to use doors?
-					if (Config.allowDoors) {
-						return event;
-					}
-				}
-				
-				//is it some other block?
-				if (event instanceof RightClickBlock) {
-					//are we allowed to right click other blocks?
-					if (Config.allowRightClickBlock) {
-						return event;
-					}
-				}
-				
-				//is it an item in the hand?
-				if(event instanceof RightClickItem ) {
-					//are we allowed to right click items in our hands?
-					if (Config.allowRightClickItem) {
-						return event;
-					}
-				}
-				
-				//if we got here then the event should be canceled
-				if(event.isCancelable()) {
-					event.setCanceled(true);
+		if (block != null && block != player) { // it is a block and the block is not the player
+			if (Config.debugMode)
+				player.sendMessage(new TextComponentString("check interaction type"));
+
+			// no left clicking!
+			if (event instanceof PlayerInteractEvent.LeftClickBlock) {
+				if (Config.debugMode)
+					player.sendMessage(new TextComponentString("you're left clicking something"));
+				if (event.isCancelable()) {
+					event.setCanceled(true); // don't be harvesting circuits things that are being checked for below
+					return event;
+				} else {
+					return null;
 				}
 			}
+
+			// is it a button or lever?
+			if (block.canProvidePower()) {
+				// are you we allowed to do use them
+				if (Config.debugMode)
+					player.sendMessage(new TextComponentString("it provides power!"));
+				if (Config.allowCircuits) {
+					return event;
+				} else {
+					if (event.isCancelable()) {
+						event.setCanceled(true);
+					} else {
+						return null;
+					}
+				}
+			}
+
+			// is the block a container?
+			if (block.hasComparatorInputOverride()) {
+				// are we allowed to use them?
+				if (Config.debugMode)
+					player.sendMessage(new TextComponentString("it's an inventory"));
+				if (Config.allowContainers) {
+					return event;
+				} else {
+					if (event.isCancelable()) {
+						event.setCanceled(true);
+					} else {
+						return null;
+					}
+				}
+			}
+
+			// is it a door?
+			if (block.getProperties().containsKey(OPEN)) {
+				// are we allowed to use doors?
+				if (Config.debugMode)
+					player.sendMessage(new TextComponentString("this opens and closes"));
+
+				if (Config.allowDoors) {
+					return event;
+				} else {
+					if (event.isCancelable()) {
+						event.setCanceled(true);
+					} else {
+						return null;
+					}
+				}
+			}
+
+			// is it some other block?
+			if (event instanceof RightClickBlock) {
+				// are we allowed to right click other blocks?
+				if (Config.debugMode)
+					player.sendMessage(new TextComponentString("you're right clicking it!"));
+
+				if (Config.allowRightClickBlock) {
+					return event;
+				} else {
+					if (event.isCancelable()) {
+						event.setCanceled(true);
+					} else {
+						return null;
+					}
+				}
+			}
+
+			// is it an item in the hand?
+			if (event instanceof RightClickItem) {
+				// are we allowed to right click items in our hands?
+				if (Config.debugMode)
+					player.sendMessage(new TextComponentString("right clicking item in hand"));
+
+				if (Config.allowRightClickItem) {
+					return event;
+				} else {
+					if (event.isCancelable()) {
+						event.setCanceled(true);
+					} else {
+						return null;
+					}
+				}
+			}
+
+			// if we got here then the event should be canceled
+			if (event.isCancelable()) {
+				event.setCanceled(true);
+			} else {
+				return null;
+			}
 		}
-		
-		//let something else process the event
+
+		// let something else process the event
 		return event;
-		
+
 	}
 
 }
-
