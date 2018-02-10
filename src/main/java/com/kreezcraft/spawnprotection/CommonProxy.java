@@ -15,6 +15,7 @@ import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickBlock;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent.RightClickItem;
@@ -240,6 +241,8 @@ public class CommonProxy {
 			}
 		}
 
+	
+		
 		if (block != null && block != player) { // it is a block and the block is not the player
 			if (Config.debugMode)
 				player.sendMessage(new TextComponentString("check interaction type"));
@@ -255,7 +258,7 @@ public class CommonProxy {
 					return null;
 				}
 			}
-
+			
 			// is it a button or lever?
 			if (block.canProvidePower()) {
 				// are you we allowed to do use them
@@ -338,7 +341,7 @@ public class CommonProxy {
 					}
 				}
 			}
-
+			if (event instanceof LivingEvent) return event;
 			// if we got here then the event should be canceled
 			if (event.isCancelable()) {
 				event.setCanceled(true);
