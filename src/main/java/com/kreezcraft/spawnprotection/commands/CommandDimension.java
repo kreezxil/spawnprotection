@@ -63,8 +63,8 @@ public class CommandDimension extends CommandBase {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		if (dim == "end") {
-			if (truth == "true") {
+		if (dim.equalsIgnoreCase("end")) {
+			if (truth.equalsIgnoreCase("true")) {
 				sender.sendMessage(new TextComponentString(dim + " set to " + truth));
 				Config.theEnd = true;
 			} else {
@@ -72,8 +72,8 @@ public class CommandDimension extends CommandBase {
 				Config.theEnd = false;
 			}
 		}
-		if (dim == "overworld") {
-			if (truth == "true") {
+		if (dim.equalsIgnoreCase("overworld")) {
+			if (truth.equalsIgnoreCase("true")) {
 				sender.sendMessage(new TextComponentString(dim + " set to " + truth));
 				Config.overWorld = true;
 			} else {
@@ -81,8 +81,8 @@ public class CommandDimension extends CommandBase {
 				Config.overWorld = false;
 			}
 		}
-		if (dim == "nether") {
-			if (truth == "true") {
+		if (dim.equalsIgnoreCase("nether")) {
+			if (truth.equalsIgnoreCase("true")) {
 				sender.sendMessage(new TextComponentString(dim + " set to " + truth));
 				Config.theNether = true;
 			} else {

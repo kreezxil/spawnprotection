@@ -21,6 +21,11 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandAllow extends CommandBase {
 
 	@Override
+	public int compareTo(ICommand p_compareTo_1_) {
+		return super.compareTo(p_compareTo_1_);
+	}
+
+	@Override
 	@Nonnull
 	public String getName() {
 		return "allow";
@@ -51,48 +56,46 @@ public class CommandAllow extends CommandBase {
 			return;
 		}
 
-		String action = args[0].toLowerCase();
-		String truth = args[1].toLowerCase();
+		boolean theTruth = false;
 
 		List<String> options = Lists.newArrayList("circuits", "containers", "doors", "place", "block", "item");
 		List<String> truths = Lists.newArrayList("true", "false");
 
-		if (!options.contains(action)) {
-				sender.sendMessage(new TextComponentString(getUsage(sender)));
+		if (!options.contains(args[0].toLowerCase())) {
+			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		if (!truths.contains(truth)) {
+		if (!truths.contains(args[1].toLowerCase())) {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
 
-		sender.sendMessage(new TextComponentString("Action:["+action+"]"));
-		sender.sendMessage(new TextComponentString(" Truth:["+truth+"]"));
-		
-		boolean theTruth;
-		if (truth == "true") {
+		sender.sendMessage(new TextComponentString("Action:[" + args[0].toLowerCase() + "]"));
+		sender.sendMessage(new TextComponentString(" Truth:[" + args[1].toLowerCase() + "]"));
+
+		if (args[1].equalsIgnoreCase("true")) {
 			theTruth = true;
 		} else {
 			theTruth = false;
 		}
 
-		if (action == "circuits") {
+		if (args[0].equalsIgnoreCase("circuits")) {
 			Config.allowCircuits = theTruth;
-			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
-		} else if (action == "containers") {
-			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
+			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
+		} else if (args[0].equalsIgnoreCase("containers")) {
+			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
 			Config.allowContainers = theTruth;
-		} else if (action == "doors") {
-			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
+		} else if (args[0].equalsIgnoreCase("doors")) {
+			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
 			Config.allowDoors = theTruth;
-		} else if (action == "place") {
-			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
+		} else if (args[0].equalsIgnoreCase("place")) {
+			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
 			Config.allowPlaceBlock = theTruth;
-		} else if (action == "block") {
-			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
+		} else if (args[0].equalsIgnoreCase("block")) {
+			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
 			Config.allowRightClickBlock = theTruth;
-		} else if (action == "item") {
-			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
+		} else if (args[0].equalsIgnoreCase("item")) {
+			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
 			Config.allowRightClickItem = theTruth;
 		}
 
@@ -110,7 +113,7 @@ public class CommandAllow extends CommandBase {
 	@Nonnull
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
 			@Nullable BlockPos targetPos) {
-		return Collections.emptyList();
+		return null;
 	}
 
 }

@@ -56,7 +56,7 @@ public class CommandRadius extends CommandBase {
 			sender.sendMessage(new TextComponentString("Radius must be a whole number from 1 to infinity!"));
 			return;
 		}
-		if (action != "radius") {
+		if (!action.equalsIgnoreCase("radius")) {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
