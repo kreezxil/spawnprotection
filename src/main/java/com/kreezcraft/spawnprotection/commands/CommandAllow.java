@@ -99,7 +99,7 @@ public class CommandAllow extends CommandBase {
 			Config.allowRightClickItem = theTruth;
 		}
 
-		Config.saveConfig();
+		Config.readConfig();
 
 		return;
 	}

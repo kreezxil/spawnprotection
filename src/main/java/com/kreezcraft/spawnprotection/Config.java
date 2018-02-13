@@ -8,9 +8,9 @@ public class Config {
 
     public static Configuration cfg = ServerProxy.config;
 
-    private static final String CATEGORY_PROTECTION = "protection";
-    private static final String CATEGORY_DIMENSIONS = "dimensions";
-    private static final String CATEGORY_INTERACTION = "interaction";
+    private static String CATEGORY_PROTECTION = "protection";
+    private static String CATEGORY_DIMENSIONS = "dimensions";
+    private static String CATEGORY_INTERACTION = "interaction";
    
     public static boolean debugMode = false;
     
@@ -59,11 +59,11 @@ public class Config {
         allowRightClickBlock = cfg.getBoolean("allowRightClickBlock", CATEGORY_INTERACTION, allowRightClickBlock, "If true the player can right click on blocks in the area for interaction.");
         allowRightClickItem = cfg.getBoolean("allowRightClickItem", CATEGORY_INTERACTION, allowRightClickItem, "If true the player can right click on items in their hand for interaction.");
         allowPlaceBlock = cfg.getBoolean("allowPlaceBlock", CATEGORY_INTERACTION, allowPlaceBlock, "If true the player can place blocks. If false they can not and further it will eat their blocks. You might want to warn them about that. Also I'm working on it.");
+        if(cfg.hasChanged()) {
+        	cfg.save();
+        }
     }
 
-	public static void saveConfig() {
-		cfg.save();
-		
-	}
+
 
 }

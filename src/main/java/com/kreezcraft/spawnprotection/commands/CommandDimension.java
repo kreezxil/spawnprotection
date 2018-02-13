@@ -91,7 +91,7 @@ public class CommandDimension extends CommandBase {
 			}
 		}
 
-		Config.saveConfig();
+		Config.readConfig();
 
 		return;
 	}

@@ -68,7 +68,7 @@ public class CommandRadius extends CommandBase {
 		Config.spawnProtection = intRadius;
 		sender.sendMessage(new TextComponentString(action + " set to " + intRadius));
 
-		Config.saveConfig();
+		Config.readConfig();
 
 		return;
 	}
