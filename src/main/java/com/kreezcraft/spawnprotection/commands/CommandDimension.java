@@ -65,27 +65,33 @@ public class CommandDimension extends CommandBase {
 		}
 		if (dim == "end") {
 			if (truth == "true") {
+				sender.sendMessage(new TextComponentString(dim + " set to " + truth));
 				Config.theEnd = true;
 			} else {
+				sender.sendMessage(new TextComponentString(dim + " set to " + truth));
 				Config.theEnd = false;
 			}
 		}
 		if (dim == "overworld") {
 			if (truth == "true") {
+				sender.sendMessage(new TextComponentString(dim + " set to " + truth));
 				Config.overWorld = true;
 			} else {
+				sender.sendMessage(new TextComponentString(dim + " set to " + truth));
 				Config.overWorld = false;
 			}
 		}
 		if (dim == "nether") {
 			if (truth == "true") {
+				sender.sendMessage(new TextComponentString(dim + " set to " + truth));
 				Config.theNether = true;
 			} else {
+				sender.sendMessage(new TextComponentString(dim + " set to " + truth));
 				Config.theNether = false;
 			}
 		}
 
-		Config.cfg.save();
+		Config.saveConfig();
 
 		return;
 	}

@@ -53,12 +53,12 @@ public class SpawnProtection {
 	 * 
 	 * Kreezxil 2/9/2018
 	 */
-	// @Mod.EventHandler
-	// public void serverLoad(FMLServerStartingEvent event) {
-	//
-	// event.registerServerCommand(new CommandAllow());
-	// event.registerServerCommand(new CommandDimension());
-	// event.registerServerCommand(new CommandRadius());
-	// }
+	 @Mod.EventHandler
+	 public void serverLoad(FMLServerStartingEvent event) {
+	
+	 event.registerServerCommand(new CommandAllow());
+	 event.registerServerCommand(new CommandDimension());
+	 event.registerServerCommand(new CommandRadius());
+	 }
 
 }

@@ -58,10 +58,7 @@ public class CommandAllow extends CommandBase {
 		List<String> truths = Lists.newArrayList("true", "false");
 
 		if (!options.contains(action)) {
-			// if (action != "circuits" && action != "containers" && action != "doors" &&
-			// action != "place"
-			// && action != "block" && action != "item") {
-			sender.sendMessage(new TextComponentString(getUsage(sender)));
+				sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
 		if (!truths.contains(truth)) {
@@ -69,6 +66,9 @@ public class CommandAllow extends CommandBase {
 			return;
 		}
 
+		sender.sendMessage(new TextComponentString("Action:["+action+"]"));
+		sender.sendMessage(new TextComponentString(" Truth:["+truth+"]"));
+		
 		boolean theTruth;
 		if (truth == "true") {
 			theTruth = true;
@@ -78,19 +78,25 @@ public class CommandAllow extends CommandBase {
 
 		if (action == "circuits") {
 			Config.allowCircuits = theTruth;
+			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
 		} else if (action == "containers") {
+			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
 			Config.allowContainers = theTruth;
 		} else if (action == "doors") {
+			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
 			Config.allowDoors = theTruth;
 		} else if (action == "place") {
+			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
 			Config.allowPlaceBlock = theTruth;
 		} else if (action == "block") {
+			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
 			Config.allowRightClickBlock = theTruth;
 		} else if (action == "item") {
+			sender.sendMessage(new TextComponentString(action + " set to " + theTruth));
 			Config.allowRightClickItem = theTruth;
 		}
 
-		Config.cfg.save();
+		Config.saveConfig();
 
 		return;
 	}
