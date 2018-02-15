@@ -106,7 +106,10 @@ public class CommandDimension extends CommandBase {
 
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		return true;
+		if(server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
+			return true; //ops can use the command
+		}
+		return false;
 	}
 
 }
