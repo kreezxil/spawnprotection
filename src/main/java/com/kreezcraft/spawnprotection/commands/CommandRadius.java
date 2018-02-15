@@ -7,7 +7,9 @@ import java.util.List;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
+import com.google.common.collect.Lists;
 import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.SpawnProtection;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -19,6 +21,13 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 
 public class CommandRadius extends CommandBase {
+
+	public CommandRadius() {
+		aliases = Lists.newArrayList(SpawnProtection.MODID, "radius","diameter");
+	}
+	
+	private final List<String> aliases;
+	
 
 	@Override
 	@Nonnull
@@ -35,8 +44,6 @@ public class CommandRadius extends CommandBase {
 	@Override
 	@Nonnull
 	public List<String> getAliases() {
-		List<String> aliases = new ArrayList<String>();
-		aliases.add(null);
 		return aliases;
 	}
 
@@ -48,8 +55,8 @@ public class CommandRadius extends CommandBase {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		String action = args[0].toLowerCase();
-		String radius = args[1].toLowerCase();
+		String action = args[0];
+		String radius = args[1];
 		try {
 			intRadius = Integer.parseInt(radius);
 		} catch (NumberFormatException e) {
@@ -66,16 +73,10 @@ public class CommandRadius extends CommandBase {
 			return;
 		}
 		Config.spawnProtection = intRadius;
-		sender.sendMessage(new TextComponentString(action + " set to " + intRadius));
 
-		Config.readConfig();
+		Config.cfg.save();
 
 		return;
-	}
-
-	@Override
-	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		return CommandLib.checkPermission(server, sender);
 	}
 
 	@Override
@@ -83,6 +84,11 @@ public class CommandRadius extends CommandBase {
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
 			@Nullable BlockPos targetPos) {
 		return Collections.emptyList();
+	}
+
+	@Override
+	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+		return true;
 	}
 
 }

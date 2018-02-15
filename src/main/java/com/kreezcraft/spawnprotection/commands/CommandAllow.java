@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.SpawnProtection;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -20,11 +21,12 @@ import net.minecraft.util.text.TextComponentString;
 
 public class CommandAllow extends CommandBase {
 
-	@Override
-	public int compareTo(ICommand p_compareTo_1_) {
-		return super.compareTo(p_compareTo_1_);
+	public CommandAllow() {
+		aliases = Lists.newArrayList(SpawnProtection.MODID, "allow","permit");
 	}
-
+	
+	private final List<String> aliases;
+	
 	@Override
 	@Nonnull
 	public String getName() {
@@ -43,8 +45,6 @@ public class CommandAllow extends CommandBase {
 	@Override
 	@Nonnull
 	public List<String> getAliases() {
-		List<String> aliases = new ArrayList<String>();
-		aliases.add("permit");
 		return aliases;
 	}
 
@@ -56,64 +56,70 @@ public class CommandAllow extends CommandBase {
 			return;
 		}
 
-		boolean theTruth = false;
+		String action = args[0];
+		String truth = args[1];
 
 		List<String> options = Lists.newArrayList("circuits", "containers", "doors", "place", "block", "item");
 		List<String> truths = Lists.newArrayList("true", "false");
 
-		if (!options.contains(args[0].toLowerCase())) {
+		if (!options.contains(action)) {
+			// if (action != "circuits" && action != "containers" && action != "doors" &&
+			// action != "place"
+			// && action != "block" && action != "item") {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		if (!truths.contains(args[1].toLowerCase())) {
+		if (!truths.contains(truth)) {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
 
-		sender.sendMessage(new TextComponentString("Action:[" + args[0].toLowerCase() + "]"));
-		sender.sendMessage(new TextComponentString(" Truth:[" + args[1].toLowerCase() + "]"));
-
-		if (args[1].equalsIgnoreCase("true")) {
+		boolean theTruth;
+		if (truth.equalsIgnoreCase("true")) {
 			theTruth = true;
 		} else {
 			theTruth = false;
 		}
 
-		if (args[0].equalsIgnoreCase("circuits")) {
+		if (action.equalsIgnoreCase("circuits")) {
 			Config.allowCircuits = theTruth;
-			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
-		} else if (args[0].equalsIgnoreCase("containers")) {
-			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
+			Config.cfg.get(Config.CATEGORY_INTERACTION, "allowCircuits", theTruth); //i'd be happier if the function was "set"
+		} else if (action.equalsIgnoreCase("containers")) {
 			Config.allowContainers = theTruth;
-		} else if (args[0].equalsIgnoreCase("doors")) {
-			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
+			Config.cfg.get(Config.CATEGORY_INTERACTION, "containers", theTruth); //i'd be happier if the function was "set"
+		} else if (action.equalsIgnoreCase("doors")) {
 			Config.allowDoors = theTruth;
-		} else if (args[0].equalsIgnoreCase("place")) {
-			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
+			Config.cfg.get(Config.CATEGORY_INTERACTION, "doors", theTruth); //i'd be happier if the function was "set"
+		} else if (action.equalsIgnoreCase("place")) {
 			Config.allowPlaceBlock = theTruth;
-		} else if (args[0].equalsIgnoreCase("block")) {
-			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
+			Config.cfg.get(Config.CATEGORY_INTERACTION, "place", theTruth); //i'd be happier if the function was "set"
+		} else if (action.equalsIgnoreCase("block")) {
 			Config.allowRightClickBlock = theTruth;
-		} else if (args[0].equalsIgnoreCase("item")) {
-			sender.sendMessage(new TextComponentString(args[0] + " set to " + theTruth));
+			Config.cfg.get(Config.CATEGORY_INTERACTION, "block", theTruth); //i'd be happier if the function was "set"
+		} else if (action.equalsIgnoreCase("item")) {
 			Config.allowRightClickItem = theTruth;
+			Config.cfg.get(Config.CATEGORY_INTERACTION, "item", theTruth); //i'd be happier if the function was "set"
 		}
 
-		Config.readConfig();
-
+		if(Config.cfg.hasChanged()) {
+			sender.sendMessage(new TextComponentString("config updated"));
+			Config.cfg.save();	
+		} else {
+			sender.sendMessage(new TextComponentString("config not updated"));
+		}
+		
 		return;
-	}
-
-	@Override
-	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		return CommandLib.checkPermission(server, sender);
 	}
 
 	@Override
 	@Nonnull
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
 			@Nullable BlockPos targetPos) {
-		return null;
+		return Collections.emptyList();
 	}
 
+	@Override
+	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+		return true;
+	}
 }
