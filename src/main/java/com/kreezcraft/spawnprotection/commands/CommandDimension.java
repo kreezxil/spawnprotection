@@ -23,7 +23,7 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandDimension extends CommandBase {
 
 	public CommandDimension() {
-		aliases = Lists.newArrayList(SpawnProtection.MODID, "dim");
+		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-dim");
 	}
 	
 	private final List<String> aliases;
@@ -31,13 +31,13 @@ public class CommandDimension extends CommandBase {
 	@Override
 	@Nonnull
 	public String getName() {
-		return "dimension";
+		return "sp-dimension";
 	}
 
 	@Override
 	@Nonnull
 	public String getUsage(@Nonnull ICommandSender sender) {
-		return "/dimension <end|nether|overworld> <true|false>\n" + "    determines if spawn protection is\n"
+		return "/sp-dimension <end|nether|overworld> <true|false>\n" + "    determines if spawn protection is\n"
 				+ "    enabled or not for the dimension.";
 	}
 
@@ -70,27 +70,29 @@ public class CommandDimension extends CommandBase {
 		}
 		if (dim.equalsIgnoreCase("end")) {
 			if (truth.equalsIgnoreCase("true")) {
-				Config.theEnd = true;
+				Config.theEnd.set(true);
 			} else {
-				Config.theEnd = false;
+				Config.theEnd.set(false);
 			}
 		}
 		if (dim.equalsIgnoreCase("overworld")) {
 			if (truth.equalsIgnoreCase("true")) {
-				Config.overWorld = true;
+				Config.overWorld.set(true);
 			} else {
-				Config.overWorld = false;
+				Config.overWorld.set(false);
 			}
 		}
 		if (dim.equalsIgnoreCase("nether")) {
 			if (truth.equalsIgnoreCase("true")) {
-				Config.theNether = true;
+				Config.theNether.set(true);
 			} else {
-				Config.theNether = false;
+				Config.theNether.set(false);
 			}
 		}
 
-		// Config.cfg.save();
+		if(Config.cfg.hasChanged()) {
+			Config.cfg.save();
+		}
 
 		return;
 	}

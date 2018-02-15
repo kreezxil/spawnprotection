@@ -89,21 +89,21 @@ public class CommonProxy {
 
 		// overWorld
 		case 0:
-			if (!Config.overWorld) {
+			if (!Config.overWorld.getBoolean()) {
 				return event;
 			}
 			break;
 
 		// Nether
 		case -1:
-			if (!Config.theNether) {
+			if (!Config.theNether.getBoolean()) {
 				return event;
 			}
 			break;
 
 		// The End
 		case 1:
-			if (!Config.theEnd) {
+			if (!Config.theEnd.getBoolean()) {
 				return event;
 			}
 			break;
@@ -113,28 +113,31 @@ public class CommonProxy {
 			return event;
 		}
 
-		if (px > wx + Config.spawnProtection || pz > wz + Config.spawnProtection || px < wx - Config.spawnProtection
-				|| pz < wz - Config.spawnProtection) {
+		if (px > wx + Config.spawnProtection.getInt() || pz > wz + Config.spawnProtection.getInt()
+				|| px < wx - Config.spawnProtection.getInt() || pz < wz - Config.spawnProtection.getInt()) {
 			// player is outside the spawn protected area
 			return event;
 		}
 
-		// is the player in creative or an operator?
-		if (player != null && player.isCreative()) {
-			return event;
-		}
-
-		// is it a real server?
-		if (server != null && !server.isSinglePlayer() && player != null) {
-
-			if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
-				// player is op
+		// if the ignoreOp is false then process the follow block
+		if (!Config.ignoreOp.getBoolean()) {
+			// is the player in creative or an operator?
+			if (player != null && player.isCreative()) {
 				return event;
 			}
 
+			// is it a real server?
+			if (server != null && !server.isSinglePlayer() && player != null) {
+
+				if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
+					// player is op
+					return event;
+				}
+
+			}
 		}
 
-		if (Config.allowPlaceBlock) {
+		if (Config.allowPlaceBlock.getBoolean()) {
 			return event;
 		}
 
@@ -199,21 +202,21 @@ public class CommonProxy {
 
 		// overWorld
 		case 0:
-			if (!Config.overWorld) {
+			if (!Config.overWorld.getBoolean()) {
 				return event;
 			}
 			break;
 
 		// Nether
 		case -1:
-			if (!Config.theNether) {
+			if (!Config.theNether.getBoolean()) {
 				return event;
 			}
 			break;
 
 		// The End
 		case 1:
-			if (!Config.theEnd) {
+			if (!Config.theEnd.getBoolean()) {
 				return event;
 			}
 			break;
@@ -223,33 +226,36 @@ public class CommonProxy {
 			return event;
 		}
 
-		if (px > wx + Config.spawnProtection || pz > wz + Config.spawnProtection || px < wx - Config.spawnProtection
-				|| pz < wz - Config.spawnProtection) {
+		if (px > wx + Config.spawnProtection.getInt() || pz > wz + Config.spawnProtection.getInt()
+				|| px < wx - Config.spawnProtection.getInt() || pz < wz - Config.spawnProtection.getInt()) {
 			// player is outside the spawn protected area
 			return event;
 		}
 
-		// is the player in creative or an operator?
-		if (player.isCreative()) {
-			return event;
-		}
-		// is it a real server?
-		if (server != null && !server.isSinglePlayer()) {
-			if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
-				// player is op
+		// if ignoreOp is false, then process the next block
+		if (!Config.ignoreOp.getBoolean()) {
+
+			// is the player in creative or an operator?
+			if (player.isCreative()) {
 				return event;
+			}
+
+			// is it a real server?
+			if (server != null && !server.isSinglePlayer()) {
+				if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
+					// player is op
+					return event;
+				}
 			}
 		}
 
-	
-		
 		if (block != null && block != player) { // it is a block and the block is not the player
-			if (Config.debugMode)
+			if (Config.debugMode.getBoolean())
 				player.sendMessage(new TextComponentString("check interaction type"));
 
 			// no left clicking!
 			if (event instanceof PlayerInteractEvent.LeftClickBlock) {
-				if (Config.debugMode)
+				if (Config.debugMode.getBoolean())
 					player.sendMessage(new TextComponentString("you're left clicking something"));
 				if (event.isCancelable()) {
 					event.setCanceled(true); // don't be harvesting circuits things that are being checked for below
@@ -258,13 +264,13 @@ public class CommonProxy {
 					return null;
 				}
 			}
-			
+
 			// is it a button or lever?
 			if (block.canProvidePower()) {
 				// are you we allowed to do use them
-				if (Config.debugMode)
+				if (Config.debugMode.getBoolean())
 					player.sendMessage(new TextComponentString("it provides power!"));
-				if (Config.allowCircuits) {
+				if (Config.allowCircuits.getBoolean()) {
 					return event;
 				} else {
 					if (event.isCancelable()) {
@@ -278,9 +284,9 @@ public class CommonProxy {
 			// is the block a container?
 			if (block.hasComparatorInputOverride()) {
 				// are we allowed to use them?
-				if (Config.debugMode)
+				if (Config.debugMode.getBoolean())
 					player.sendMessage(new TextComponentString("it's an inventory"));
-				if (Config.allowContainers) {
+				if (Config.allowContainers.getBoolean()) {
 					return event;
 				} else {
 					if (event.isCancelable()) {
@@ -294,10 +300,10 @@ public class CommonProxy {
 			// is it a door?
 			if (block.getProperties().containsKey(OPEN)) {
 				// are we allowed to use doors?
-				if (Config.debugMode)
+				if (Config.debugMode.getBoolean())
 					player.sendMessage(new TextComponentString("this opens and closes"));
 
-				if (Config.allowDoors) {
+				if (Config.allowDoors.getBoolean()) {
 					return event;
 				} else {
 					if (event.isCancelable()) {
@@ -311,10 +317,10 @@ public class CommonProxy {
 			// is it some other block?
 			if (event instanceof RightClickBlock) {
 				// are we allowed to right click other blocks?
-				if (Config.debugMode)
+				if (Config.debugMode.getBoolean())
 					player.sendMessage(new TextComponentString("you're right clicking it!"));
 
-				if (Config.allowRightClickBlock) {
+				if (Config.allowRightClickBlock.getBoolean()) {
 					return event;
 				} else {
 					if (event.isCancelable()) {
@@ -328,10 +334,10 @@ public class CommonProxy {
 			// is it an item in the hand?
 			if (event instanceof RightClickItem) {
 				// are we allowed to right click items in our hands?
-				if (Config.debugMode)
+				if (Config.debugMode.getBoolean())
 					player.sendMessage(new TextComponentString("right clicking item in hand"));
 
-				if (Config.allowRightClickItem) {
+				if (Config.allowRightClickItem.getBoolean()) {
 					return event;
 				} else {
 					if (event.isCancelable()) {
@@ -341,7 +347,8 @@ public class CommonProxy {
 					}
 				}
 			}
-			if (event instanceof LivingEvent) return event;
+			if (event instanceof LivingEvent)
+				return event;
 			// if we got here then the event should be canceled
 			if (event.isCancelable()) {
 				event.setCanceled(true);

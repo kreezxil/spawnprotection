@@ -3,7 +3,10 @@ package com.kreezcraft.spawnprotection;
 import org.apache.logging.log4j.Logger;
 
 import com.kreezcraft.spawnprotection.commands.CommandAllow;
+import com.kreezcraft.spawnprotection.commands.CommandDebug;
 import com.kreezcraft.spawnprotection.commands.CommandDimension;
+import com.kreezcraft.spawnprotection.commands.CommandDisplay;
+import com.kreezcraft.spawnprotection.commands.CommandIgnoreOp;
 import com.kreezcraft.spawnprotection.commands.CommandRadius;
 import net.minecraft.init.Blocks;
 import net.minecraftforge.fml.common.Mod;
@@ -53,12 +56,14 @@ public class SpawnProtection {
 	 * 
 	 * Kreezxil 2/9/2018
 	 */
-	 @Mod.EventHandler
-	 public void serverLoad(FMLServerStartingEvent event) {
-	
-	 event.registerServerCommand(new CommandAllow());
-	 event.registerServerCommand(new CommandDimension());
-	 event.registerServerCommand(new CommandRadius());
-	 }
+	@Mod.EventHandler
+	public void serverLoad(FMLServerStartingEvent event) {
+		event.registerServerCommand(new CommandDisplay());
+		event.registerServerCommand(new CommandDebug());
+		event.registerServerCommand(new CommandIgnoreOp());
+		event.registerServerCommand(new CommandAllow());
+		event.registerServerCommand(new CommandDimension());
+		event.registerServerCommand(new CommandRadius());
+	}
 
 }

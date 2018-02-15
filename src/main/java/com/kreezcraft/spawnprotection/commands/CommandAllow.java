@@ -22,7 +22,7 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandAllow extends CommandBase {
 
 	public CommandAllow() {
-		aliases = Lists.newArrayList(SpawnProtection.MODID, "allow","permit");
+		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-allow","sp-permit");
 	}
 	
 	private final List<String> aliases;
@@ -30,16 +30,14 @@ public class CommandAllow extends CommandBase {
 	@Override
 	@Nonnull
 	public String getName() {
-		return "allow";
+		return "sp-allow";
 	}
 
 	@Override
 	@Nonnull
 	public String getUsage(@Nonnull ICommandSender sender) {
-		return "/allow <circuits|containers|doors|place|block|item> <true|false>\n"
-				+ "    enables or disables the types of actions\n" + "    circuits=redstone, buttons, levers\n"
-				+ "    containers=inventory objects\n" + "    doors=doors & trapdoors\n" + "    place=block placement\n"
-				+ "    block=block interaction\n" + "    item=item interaction aka your hand item";
+		return "/sp-allow <circuits|containers|doors|place|block|item> <true|false>\n"
+				+ "    enables or disables the types of interactions\n";
 	}
 
 	@Override
@@ -82,23 +80,17 @@ public class CommandAllow extends CommandBase {
 		}
 
 		if (action.equalsIgnoreCase("circuits")) {
-			Config.allowCircuits = theTruth;
-			Config.cfg.get(Config.CATEGORY_INTERACTION, "allowCircuits", theTruth); //i'd be happier if the function was "set"
+			Config.allowCircuits.set(theTruth);
 		} else if (action.equalsIgnoreCase("containers")) {
-			Config.allowContainers = theTruth;
-			Config.cfg.get(Config.CATEGORY_INTERACTION, "containers", theTruth); //i'd be happier if the function was "set"
+			Config.allowContainers.set(theTruth);
 		} else if (action.equalsIgnoreCase("doors")) {
-			Config.allowDoors = theTruth;
-			Config.cfg.get(Config.CATEGORY_INTERACTION, "doors", theTruth); //i'd be happier if the function was "set"
+			Config.allowDoors.set(theTruth);
 		} else if (action.equalsIgnoreCase("place")) {
-			Config.allowPlaceBlock = theTruth;
-			Config.cfg.get(Config.CATEGORY_INTERACTION, "place", theTruth); //i'd be happier if the function was "set"
+			Config.allowPlaceBlock.set(theTruth);
 		} else if (action.equalsIgnoreCase("block")) {
-			Config.allowRightClickBlock = theTruth;
-			Config.cfg.get(Config.CATEGORY_INTERACTION, "block", theTruth); //i'd be happier if the function was "set"
+			Config.allowRightClickBlock.set(theTruth);
 		} else if (action.equalsIgnoreCase("item")) {
-			Config.allowRightClickItem = theTruth;
-			Config.cfg.get(Config.CATEGORY_INTERACTION, "item", theTruth); //i'd be happier if the function was "set"
+			Config.allowRightClickItem.set(theTruth);
 		}
 
 		if(Config.cfg.hasChanged()) {
