@@ -10,6 +10,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.SpawnProtection;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -21,24 +22,28 @@ import net.minecraft.util.text.TextComponentString;
 
 public class CommandDimension extends CommandBase {
 
+	public CommandDimension() {
+		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-dim");
+	}
+	
+	private final List<String> aliases;
+	
 	@Override
 	@Nonnull
 	public String getName() {
-		return "dimension";
+		return "sp-dimension";
 	}
 
 	@Override
 	@Nonnull
 	public String getUsage(@Nonnull ICommandSender sender) {
-		return "/dimension <end|nether|overworld> <true|false>\n" + "    determines if spawn protection is\n"
+		return "/sp-dimension <end|nether|overworld> <true|false>\n" + "    determines if spawn protection is\n"
 				+ "    enabled or not for the dimension.";
 	}
 
 	@Override
 	@Nonnull
 	public List<String> getAliases() {
-		List<String> aliases = new ArrayList<String>();
-		aliases.add("dim");
 		return aliases;
 	}
 
@@ -49,8 +54,8 @@ public class CommandDimension extends CommandBase {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		String dim = args[0].toLowerCase();
-		String truth = args[1].toLowerCase();
+		String dim = args[0];
+		String truth = args[1];
 
 		List<String> dims = Lists.newArrayList("end", "nether", "overworld");
 		List<String> truths = Lists.newArrayList("true", "false");
@@ -63,36 +68,33 @@ public class CommandDimension extends CommandBase {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		if (dim == "end") {
-			if (truth == "true") {
-				Config.theEnd = true;
+		if (dim.equalsIgnoreCase("end")) {
+			if (truth.equalsIgnoreCase("true")) {
+				Config.theEnd.set(true);
 			} else {
-				Config.theEnd = false;
+				Config.theEnd.set(false);
 			}
 		}
-		if (dim == "overworld") {
-			if (truth == "true") {
-				Config.overWorld = true;
+		if (dim.equalsIgnoreCase("overworld")) {
+			if (truth.equalsIgnoreCase("true")) {
+				Config.overWorld.set(true);
 			} else {
-				Config.overWorld = false;
+				Config.overWorld.set(false);
 			}
 		}
-		if (dim == "nether") {
-			if (truth == "true") {
-				Config.theNether = true;
+		if (dim.equalsIgnoreCase("nether")) {
+			if (truth.equalsIgnoreCase("true")) {
+				Config.theNether.set(true);
 			} else {
-				Config.theNether = false;
+				Config.theNether.set(false);
 			}
 		}
 
-		Config.cfg.save();
+		if(Config.cfg.hasChanged()) {
+			Config.cfg.save();
+		}
 
 		return;
-	}
-
-	@Override
-	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		return CommandLib.checkPermission(server, sender);
 	}
 
 	@Override
@@ -100,6 +102,11 @@ public class CommandDimension extends CommandBase {
 	public List<String> getTabCompletions(MinecraftServer server, ICommandSender sender, String[] args,
 			@Nullable BlockPos targetPos) {
 		return Collections.emptyList();
+	}
+
+	@Override
+	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+		return true;
 	}
 
 }

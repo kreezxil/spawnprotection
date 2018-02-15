@@ -20,25 +20,24 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
 
-public class CommandRadius extends CommandBase {
+public class CommandIgnoreOp extends CommandBase {
 
-	public CommandRadius() {
-		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-radius","sp-diameter");
+	public CommandIgnoreOp() {
+		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-ignore", "sp-ignore_op", "sp-ignoreop");
 	}
-	
+
 	private final List<String> aliases;
-	
 
 	@Override
 	@Nonnull
 	public String getName() {
-		return "sp-radius";
+		return "sp-ignore";
 	}
 
 	@Override
 	@Nonnull
 	public String getUsage(@Nonnull ICommandSender sender) {
-		return "/sp-radius <range>\n    set range of the spawn protection\n    in diameter from worldspawn";
+		return "/sp-ignore_op <true|false>\n    should we ignore the op privilege?";
 	}
 
 	@Override
@@ -50,31 +49,31 @@ public class CommandRadius extends CommandBase {
 	@Override
 	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args)
 			throws CommandException {
-		int intRadius = 0;
-		if (args.length < 2) {
+		boolean theTruth;
+		if (args.length < 1) {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		String action = args[0];
-		String radius = args[1];
-		try {
-			intRadius = Integer.parseInt(radius);
-		} catch (NumberFormatException e) {
-			sender.sendMessage(new TextComponentString("Radius must be a whole number from 1 to infinity!"));
-			return;
-		}
-		if (!action.equalsIgnoreCase("radius")) {
+		String truth = args[0];
+
+		if (truth.equalsIgnoreCase("true")) {
+			theTruth = true;
+		} else if (truth.equalsIgnoreCase("false")) {
+			theTruth = false;
+		} else {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
 
-		if (intRadius < 1) {
-			sender.sendMessage(new TextComponentString("Radius must be a whole number from 1 to infinity!"));
-			return;
-		}
-		Config.spawnProtection.set(intRadius);
+		sender.sendMessage(new TextComponentString("Ignoring Op Priveleges is "+theTruth));
+		Config.ignoreOp.set(theTruth);
 
-		Config.cfg.save();
+		if (Config.cfg.hasChanged()) {
+			if (Config.debugMode.getBoolean()) {
+				sender.sendMessage(new TextComponentString("Config is updated"));
+			}
+			Config.cfg.save();
+		}
 
 		return;
 	}

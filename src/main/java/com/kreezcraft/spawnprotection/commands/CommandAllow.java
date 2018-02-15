@@ -9,6 +9,7 @@ import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
 import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.SpawnProtection;
 
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -20,26 +21,28 @@ import net.minecraft.util.text.TextComponentString;
 
 public class CommandAllow extends CommandBase {
 
+	public CommandAllow() {
+		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-allow","sp-permit");
+	}
+	
+	private final List<String> aliases;
+	
 	@Override
 	@Nonnull
 	public String getName() {
-		return "allow";
+		return "sp-allow";
 	}
 
 	@Override
 	@Nonnull
 	public String getUsage(@Nonnull ICommandSender sender) {
-		return "/allow <circuits|containers|doors|place|block|item> <true|false>\n"
-				+ "    enables or disables the types of actions\n" + "    circuits=redstone, buttons, levers\n"
-				+ "    containers=inventory objects\n" + "    doors=doors & trapdoors\n" + "    place=block placement\n"
-				+ "    block=block interaction\n" + "    item=item interaction aka your hand item";
+		return "/sp-allow <circuits|containers|doors|place|block|item> <true|false>\n"
+				+ "    enables or disables the types of interactions\n";
 	}
 
 	@Override
 	@Nonnull
 	public List<String> getAliases() {
-		List<String> aliases = new ArrayList<String>();
-		aliases.add("permit");
 		return aliases;
 	}
 
@@ -51,8 +54,8 @@ public class CommandAllow extends CommandBase {
 			return;
 		}
 
-		String action = args[0].toLowerCase();
-		String truth = args[1].toLowerCase();
+		String action = args[0];
+		String truth = args[1];
 
 		List<String> options = Lists.newArrayList("circuits", "containers", "doors", "place", "block", "item");
 		List<String> truths = Lists.newArrayList("true", "false");
@@ -70,34 +73,34 @@ public class CommandAllow extends CommandBase {
 		}
 
 		boolean theTruth;
-		if (truth == "true") {
+		if (truth.equalsIgnoreCase("true")) {
 			theTruth = true;
 		} else {
 			theTruth = false;
 		}
 
-		if (action == "circuits") {
-			Config.allowCircuits = theTruth;
-		} else if (action == "containers") {
-			Config.allowContainers = theTruth;
-		} else if (action == "doors") {
-			Config.allowDoors = theTruth;
-		} else if (action == "place") {
-			Config.allowPlaceBlock = theTruth;
-		} else if (action == "block") {
-			Config.allowRightClickBlock = theTruth;
-		} else if (action == "item") {
-			Config.allowRightClickItem = theTruth;
+		if (action.equalsIgnoreCase("circuits")) {
+			Config.allowCircuits.set(theTruth);
+		} else if (action.equalsIgnoreCase("containers")) {
+			Config.allowContainers.set(theTruth);
+		} else if (action.equalsIgnoreCase("doors")) {
+			Config.allowDoors.set(theTruth);
+		} else if (action.equalsIgnoreCase("place")) {
+			Config.allowPlaceBlock.set(theTruth);
+		} else if (action.equalsIgnoreCase("block")) {
+			Config.allowRightClickBlock.set(theTruth);
+		} else if (action.equalsIgnoreCase("item")) {
+			Config.allowRightClickItem.set(theTruth);
 		}
 
-		Config.cfg.save();
-
+		if(Config.cfg.hasChanged()) {
+			sender.sendMessage(new TextComponentString("config updated"));
+			Config.cfg.save();	
+		} else {
+			sender.sendMessage(new TextComponentString("config not updated"));
+		}
+		
 		return;
-	}
-
-	@Override
-	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		return CommandLib.checkPermission(server, sender);
 	}
 
 	@Override
@@ -107,4 +110,8 @@ public class CommandAllow extends CommandBase {
 		return Collections.emptyList();
 	}
 
+	@Override
+	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
+		return true;
+	}
 }
