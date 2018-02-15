@@ -10,7 +10,6 @@ import javax.annotation.Nullable;
 import com.google.common.collect.Lists;
 import com.kreezcraft.spawnprotection.Config;
 import com.kreezcraft.spawnprotection.SpawnProtection;
-
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommand;
@@ -37,7 +36,7 @@ public class CommandAllow extends CommandBase {
 	@Nonnull
 	public String getUsage(@Nonnull ICommandSender sender) {
 		return "/sp-allow <circuits|containers|doors|place|block|item> <true|false>\n"
-				+ "    enables or disables the types of interactions\n";
+				+ "    enables or disables the types of interactions";
 	}
 
 	@Override
@@ -112,6 +111,10 @@ public class CommandAllow extends CommandBase {
 
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		return true;
+		if(server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
+			return true; //ops can use the command
+		}
+		return false;
 	}
+
 }
