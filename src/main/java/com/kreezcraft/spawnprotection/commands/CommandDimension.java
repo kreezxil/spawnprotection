@@ -91,7 +91,11 @@ public class CommandDimension extends CommandBase {
 		}
 
 		if(Config.cfg.hasChanged()) {
+			sender.sendMessage(new TextComponentString("Protection of "+dim+" set to "+truth));
+			sender.sendMessage(new TextComponentString("Config updated"));
 			Config.cfg.save();
+		} else {
+			sender.sendMessage(new TextComponentString("Config not updated"));
 		}
 
 		return;

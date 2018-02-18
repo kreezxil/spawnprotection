@@ -6,11 +6,13 @@ import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyBool;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.passive.EntityVillager;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.init.Blocks;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
 import net.minecraftforge.common.config.Configuration;
@@ -25,6 +27,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.eventhandler.Event;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -119,7 +122,7 @@ public class CommonProxy {
 			return event;
 		}
 
-		// if the ignoreOp is false then process the follow block
+		// if the ignoreOp is false then process the following block
 		if (!Config.ignoreOp.getBoolean()) {
 			// is the player in creative or an operator?
 			if (player != null && player.isCreative()) {
@@ -138,16 +141,19 @@ public class CommonProxy {
 		}
 
 		if (Config.allowPlaceBlock.getBoolean()) {
+
+			if(Config.debugMode.getBoolean()) System.out.println("Allowing block placement");
 			return event;
-		}
+		} else if (!Config.allowPlaceBlock.getBoolean()) {
+			if(Config.debugMode.getBoolean()) System.out.println("Canceling block placement");
+			// after this point what we are saying is that Config.allowPlaceBlock is
+			// false!!!
 
-		// after this point what we are saying is that Config.allowPlaceBlock is
-		// false!!!
-
-		if (event.isCancelable()) {
-			event.setCanceled(true); // just try to be nice first
-		} else {
-			return null; // the bullheaded way to cancel the event
+			if (event.isCancelable()) {
+				event.setCanceled(true); // just try to be nice first
+			} else {
+				return null; // the bullheaded way to cancel the event
+			}
 		}
 
 		// player.entityDropItem(new ItemStack(Item.getItemFromBlock(block.getBlock())),
@@ -171,20 +177,6 @@ public class CommonProxy {
 
 		int worldId = world.provider.getDimension();
 
-		/*
-		 * Actually it's not the player I need the check but the block with which they
-		 * are interacting. Previously this was player.getPosition().getX() etc just so
-		 * you know
-		 * 
-		 * What the javadoc says is that event's getPos, will return the position of the
-		 * thing being acted upon. And should there be no thing, then the player becomes
-		 * the thing.
-		 * 
-		 * Therefore it should be a more accurate representation of any player trying to
-		 * much around within the protected area.
-		 * 
-		 * -- Kreezxil 15 Aug, 2017
-		 */
 		px = event.getPos().getX();
 		pz = event.getPos().getZ();
 		wx = world.getSpawnPoint().getX();
@@ -198,31 +190,7 @@ public class CommonProxy {
 		// if the dimension that the player is in not configured for true, this will
 		// exit
 		// and allow them to edit the dimension spawn.
-		switch (worldId) {
-
-		// overWorld
-		case 0:
-			if (!Config.overWorld.getBoolean()) {
-				return event;
-			}
-			break;
-
-		// Nether
-		case -1:
-			if (!Config.theNether.getBoolean()) {
-				return event;
-			}
-			break;
-
-		// The End
-		case 1:
-			if (!Config.theEnd.getBoolean()) {
-				return event;
-			}
-			break;
-
-		// Some other dimensions definitely return null
-		default:
+		if(!isWorldProtected(world)) {
 			return event;
 		}
 
@@ -241,25 +209,31 @@ public class CommonProxy {
 			}
 
 			// is it a real server?
-			if (server != null && !server.isSinglePlayer()) {
+			if (server == null)
+				if(Config.debugMode.getBoolean()) player.sendMessage(str("server is null"));
+			if (server.isSinglePlayer())
+				if(Config.debugMode.getBoolean()) player.sendMessage(str("server is singleplayer"));
+
+			if (server != null && !server.isSinglePlayer() && player != null) {
+
 				if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(player.getName()) != null) {
 					// player is op
 					return event;
 				}
+
 			}
 		}
 
+	
 		if (block != null && block != player) { // it is a block and the block is not the player
-			if (Config.debugMode.getBoolean())
-				player.sendMessage(new TextComponentString("check interaction type"));
+			// BEGIN - LEGIT BLOCK
 
 			// no left clicking!
 			if (event instanceof PlayerInteractEvent.LeftClickBlock) {
-				if (Config.debugMode.getBoolean())
-					player.sendMessage(new TextComponentString("you're left clicking something"));
+				if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling left clicking of blocks"));
 				if (event.isCancelable()) {
 					event.setCanceled(true); // don't be harvesting circuits things that are being checked for below
-					return event;
+					// return event;
 				} else {
 					return null;
 				}
@@ -268,11 +242,11 @@ public class CommonProxy {
 			// is it a button or lever?
 			if (block.canProvidePower()) {
 				// are you we allowed to do use them
-				if (Config.debugMode.getBoolean())
-					player.sendMessage(new TextComponentString("it provides power!"));
 				if (Config.allowCircuits.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing circuits"));
 					return event;
-				} else {
+				} else if (!Config.allowCircuits.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling circuits"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
 					} else {
@@ -284,11 +258,11 @@ public class CommonProxy {
 			// is the block a container?
 			if (block.hasComparatorInputOverride()) {
 				// are we allowed to use them?
-				if (Config.debugMode.getBoolean())
-					player.sendMessage(new TextComponentString("it's an inventory"));
 				if (Config.allowContainers.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing container access"));
 					return event;
-				} else {
+				} else if (!Config.allowContainers.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling container access"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
 					} else {
@@ -300,12 +274,12 @@ public class CommonProxy {
 			// is it a door?
 			if (block.getProperties().containsKey(OPEN)) {
 				// are we allowed to use doors?
-				if (Config.debugMode.getBoolean())
-					player.sendMessage(new TextComponentString("this opens and closes"));
 
 				if (Config.allowDoors.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing open/close"));
 					return event;
-				} else {
+				} else if (!Config.allowDoors.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling open/close"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
 					} else {
@@ -317,14 +291,14 @@ public class CommonProxy {
 			// is it some other block?
 			if (event instanceof RightClickBlock) {
 				// are we allowed to right click other blocks?
-				if (Config.debugMode.getBoolean())
-					player.sendMessage(new TextComponentString("you're right clicking it!"));
-
 				if (Config.allowRightClickBlock.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing block right clicking"));
 					return event;
-				} else {
+				} else if (!Config.allowRightClickBlock.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling block right clicking"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
+						// return event;
 					} else {
 						return null;
 					}
@@ -334,32 +308,62 @@ public class CommonProxy {
 			// is it an item in the hand?
 			if (event instanceof RightClickItem) {
 				// are we allowed to right click items in our hands?
-				if (Config.debugMode.getBoolean())
-					player.sendMessage(new TextComponentString("right clicking item in hand"));
-
 				if (Config.allowRightClickItem.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing item right click"));
 					return event;
-				} else {
+				} else if (!Config.allowRightClickItem.getBoolean()) {
+					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling item right click"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
+						// return event;
 					} else {
 						return null;
 					}
 				}
 			}
-			if (event instanceof LivingEvent)
-				return event;
-			// if we got here then the event should be canceled
-			if (event.isCancelable()) {
-				event.setCanceled(true);
-			} else {
-				return null;
-			}
-		}
 
-		// let something else process the event
+			// villager?
+			if (block instanceof EntityVillager) {
+				if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing villager interaction"));
+				return event;
+			}
+
+			// // if we got here then the event should be canceled
+			// if (event.isCancelable()) {
+			// event.setCanceled(true);
+			// } else {
+			// return null;
+			// } else
+
+		} // END - LEGIT BLOCK -
+
+		// now return the event and let forge handle it from here based on what we did
+		// or did not do to it
 		return event;
 
 	}
 
+	private static ITextComponent str(String s) {
+		return new TextComponentString(s);
+	}
+	
+	private static Boolean isWorldProtected(World worldIn) {
+
+		
+		switch (worldIn.provider.getDimension()) {
+
+		// overWorld
+		case 0:
+			return Config.overWorld.getBoolean();
+		// Nether
+		case -1:
+			return Config.theNether.getBoolean();
+					// The End
+		case 1:
+			return Config.theEnd.getBoolean();
+		// Some other dimensions definitely return false
+		default:
+			return false;
+		}
+	}
 }

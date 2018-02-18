@@ -68,7 +68,7 @@ public class CommandDebug extends CommandBase {
 		
 		sender.sendMessage(new TextComponentString("Debug Mode is "+theTruth));
 		Config.debugMode.set(theTruth);
-
+		sender.sendMessage(new TextComponentString("Config updated"));
 		Config.cfg.save();
 
 		return;

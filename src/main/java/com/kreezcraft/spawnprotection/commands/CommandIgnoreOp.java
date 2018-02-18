@@ -65,14 +65,16 @@ public class CommandIgnoreOp extends CommandBase {
 			return;
 		}
 
-		sender.sendMessage(new TextComponentString("Ignoring Op Priveleges is "+theTruth));
+		sender.sendMessage(new TextComponentString("Ignoring Op Priveleges is " + theTruth));
 		Config.ignoreOp.set(theTruth);
 
 		if (Config.cfg.hasChanged()) {
-			if (Config.debugMode.getBoolean()) {
+			if (Config.debugMode.getBoolean()) 
 				sender.sendMessage(new TextComponentString("Config is updated"));
-			}
 			Config.cfg.save();
+		} else {
+			if (Config.debugMode.getBoolean()) 
+				sender.sendMessage(new TextComponentString("Config not updated"));
 		}
 
 		return;
@@ -87,8 +89,8 @@ public class CommandIgnoreOp extends CommandBase {
 
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		if(server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
-			return true; //ops can use the command
+		if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
+			return true; // ops can use the command
 		}
 		return false;
 	}
