@@ -21,11 +21,11 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandAllow extends CommandBase {
 
 	public CommandAllow() {
-		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-allow","sp-permit");
+		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-allow", "sp-permit");
 	}
-	
+
 	private final List<String> aliases;
-	
+
 	@Override
 	@Nonnull
 	public String getName() {
@@ -92,13 +92,15 @@ public class CommandAllow extends CommandBase {
 			Config.allowRightClickItem.set(theTruth);
 		}
 
-		if(Config.cfg.hasChanged()) {
+
+		if (Config.cfg.hasChanged()) {
+			sender.sendMessage(new TextComponentString("Interaction with the actionable type of "+action+" is set to "+truth));
 			sender.sendMessage(new TextComponentString("config updated"));
-			Config.cfg.save();	
+			Config.cfg.save();
 		} else {
 			sender.sendMessage(new TextComponentString("config not updated"));
 		}
-		
+
 		return;
 	}
 
@@ -111,8 +113,8 @@ public class CommandAllow extends CommandBase {
 
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		if(server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
-			return true; //ops can use the command
+		if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
+			return true; // ops can use the command
 		}
 		return false;
 	}

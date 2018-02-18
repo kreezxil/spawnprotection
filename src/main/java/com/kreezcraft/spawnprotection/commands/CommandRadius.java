@@ -23,11 +23,10 @@ import net.minecraft.util.text.TextComponentString;
 public class CommandRadius extends CommandBase {
 
 	public CommandRadius() {
-		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-radius","sp-diameter");
+		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-radius", "sp-diameter");
 	}
-	
+
 	private final List<String> aliases;
-	
 
 	@Override
 	@Nonnull
@@ -76,6 +75,8 @@ public class CommandRadius extends CommandBase {
 
 		Config.cfg.save();
 
+		sender.sendMessage(new TextComponentString("Radius set to " + intRadius));
+		sender.sendMessage(new TextComponentString("Config updated"));
 		return;
 	}
 
@@ -88,8 +89,8 @@ public class CommandRadius extends CommandBase {
 
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		if(server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
-			return true; //ops can use the command
+		if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
+			return true; // ops can use the command
 		}
 		return false;
 	}
