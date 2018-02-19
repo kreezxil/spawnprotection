@@ -50,20 +50,17 @@ public class CommandRadius extends CommandBase {
 	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args)
 			throws CommandException {
 		int intRadius = 0;
-		if (args.length < 2) {
+		if (args.length < 1) {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		String action = args[0];
-		String radius = args[1];
+		
+		String radius = args[0];
+
 		try {
 			intRadius = Integer.parseInt(radius);
 		} catch (NumberFormatException e) {
 			sender.sendMessage(new TextComponentString("Radius must be a whole number from 1 to infinity!"));
-			return;
-		}
-		if (!action.equalsIgnoreCase("radius")) {
-			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
 
