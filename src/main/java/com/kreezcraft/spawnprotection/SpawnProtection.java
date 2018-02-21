@@ -1,5 +1,7 @@
 package com.kreezcraft.spawnprotection;
 
+import java.io.File;
+
 import org.apache.logging.log4j.Logger;
 
 import com.kreezcraft.spawnprotection.commands.CommandAllow;
@@ -9,6 +11,7 @@ import com.kreezcraft.spawnprotection.commands.CommandDisplay;
 import com.kreezcraft.spawnprotection.commands.CommandIgnoreOp;
 import com.kreezcraft.spawnprotection.commands.CommandRadius;
 import net.minecraft.init.Blocks;
+import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.Mod.EventHandler;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -23,28 +26,33 @@ public class SpawnProtection {
 	public static final String NAME = "No Op Spawn Protection";
 	public static final String VERSION = "@VERSION@";
 
-	@SidedProxy(clientSide = "com.kreezcraft.spawnprotection.ClientProxy", serverSide = "com.kreezcraft.spawnprotection.ServerProxy")
-	public static CommonProxy proxy;
+
+//	@SidedProxy(clientSide = "com.kreezcraft.spawnprotection.ClientProxy", serverSide = "com.kreezcraft.spawnprotection.ServerProxy")
+//	public static Protection proxy;
 
 	@Mod.Instance
 	public static SpawnProtection instance;
 
 	public static Logger logger;
+	public static Configuration config;
 
 	@Mod.EventHandler
 	public void preInit(FMLPreInitializationEvent event) {
 		logger = event.getModLog();
-		proxy.preInit(event);
+		File directory = event.getModConfigurationDirectory();
+		config = new Configuration(new File(directory.getPath(), "spawnprotection.cfg"));
+		Config.readConfig();
 	}
 
 	@Mod.EventHandler
-	public void init(FMLInitializationEvent e) {
-		proxy.init(e);
+	public void init(FMLInitializationEvent event) {
 	}
 
 	@Mod.EventHandler
-	public void postInit(FMLPostInitializationEvent e) {
-		proxy.postInit(e);
+	public void postInit(FMLPostInitializationEvent event) {
+		if (config.hasChanged()) {
+			config.save();
+		}
 	}
 
 	/*

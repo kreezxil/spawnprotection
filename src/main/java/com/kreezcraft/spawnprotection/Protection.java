@@ -33,32 +33,8 @@ import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber
-public class CommonProxy {
-	public static Configuration config;
-
-	public void preInit(FMLPreInitializationEvent e) {
-		File directory = e.getModConfigurationDirectory();
-		config = new Configuration(new File(directory.getPath(), "spawnprotection.cfg"));
-		Config.readConfig();
-	}
-
-	public void init(FMLInitializationEvent e) {
-	}
-
-	public void postInit(FMLPostInitializationEvent e) {
-		if (config.hasChanged()) {
-			config.save();
-		}
-	}
-
-	@SubscribeEvent
-	public static void registerBlocks(RegistryEvent.Register<Block> event) {
-	}
-
-	@SubscribeEvent
-	public static void registerItems(RegistryEvent.Register<Item> event) {
-	}
-
+public class Protection {
+	
 	/*
 	 * there are two methods following each with duplicate code i world like to use
 	 * a function to reduce the code complexity kreezxil 11/16/2017

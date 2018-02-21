@@ -7,25 +7,11 @@ import net.minecraftforge.common.config.Property;
 
 public class Config {
 
-	public static Configuration cfg = ServerProxy.config;
+	public static Configuration cfg = SpawnProtection.config;
 
 	public static String CATEGORY_PROTECTION = "protection";
 	public static String CATEGORY_DIMENSIONS = "dimensions";
 	public static String CATEGORY_INTERACTION = "interaction";
-
-	// public static boolean debugMode;
-	//
-	// public static int spawnProtection; //default value
-	// public static boolean overWorld;
-	// public static boolean theNether;
-	// public static boolean theEnd;
-	//
-	// public static boolean allowDoors;
-	// public static boolean allowCircuits;
-	// public static boolean allowContainers;
-	// public static boolean allowRightClickBlock;
-	// public static boolean allowRightClickItem;
-	// public static boolean allowPlaceBlock;
 
 	public static Property debugMode, spawnProtection, overWorld, theNether, theEnd, allowDoors, allowCircuits,
 			allowContainers, allowRightClickBlock, allowRightClickItem, allowPlaceBlock,ignoreOp;

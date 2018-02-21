@@ -55,6 +55,10 @@ public class CommandRadius extends CommandBase {
 			return;
 		}
 		
+		if (server.getSpawnProtectionSize()>0) {
+			sender.sendMessage(new TextComponentString("Please change the value of spawn-protect= in your server.properties file to 0 otherwise you'll experience what feels like a bug."));
+		}
+		
 		String radius = args[0];
 
 		try {
