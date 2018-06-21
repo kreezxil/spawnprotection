@@ -1,6 +1,7 @@
 package com.kreezcraft.spawnprotection;
 
 import java.io.File;
+import java.util.Arrays;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.properties.PropertyBool;
@@ -15,7 +16,6 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TextComponentString;
 import net.minecraft.world.World;
-import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
@@ -34,21 +34,14 @@ import net.minecraftforge.fml.relauncher.SideOnly;
 
 @Mod.EventBusSubscriber
 public class CommonProxy {
-	public static Configuration config;
 
 	public void preInit(FMLPreInitializationEvent e) {
-		File directory = e.getModConfigurationDirectory();
-		config = new Configuration(new File(directory.getPath(), "spawnprotection.cfg"));
-		Config.readConfig();
 	}
 
 	public void init(FMLInitializationEvent e) {
 	}
 
 	public void postInit(FMLPostInitializationEvent e) {
-		if (config.hasChanged()) {
-			config.save();
-		}
 	}
 
 	@SubscribeEvent
@@ -88,42 +81,19 @@ public class CommonProxy {
 		wx = world.getSpawnPoint().getX();
 		wz = world.getSpawnPoint().getZ();
 
-		switch (worldId) {
-
-		// overWorld
-		case 0:
-			if (!Config.overWorld.getBoolean()) {
-				return event;
-			}
-			break;
-
-		// Nether
-		case -1:
-			if (!Config.theNether.getBoolean()) {
-				return event;
-			}
-			break;
-
-		// The End
-		case 1:
-			if (!Config.theEnd.getBoolean()) {
-				return event;
-			}
-			break;
-
-		// Some other dimensions definitely return null
-		default:
+		if(!Arrays.asList(ProtectionConfig.protection.allowedDimensions).contains(worldId)) {
 			return event;
 		}
-
-		if (px > wx + Config.spawnProtection.getInt() || pz > wz + Config.spawnProtection.getInt()
-				|| px < wx - Config.spawnProtection.getInt() || pz < wz - Config.spawnProtection.getInt()) {
+		
+		
+		if (px > wx + ProtectionConfig.protection.spawnProtect || pz > wz + ProtectionConfig.protection.spawnProtect
+				|| px < wx - ProtectionConfig.protection.spawnProtect || pz < wz - ProtectionConfig.protection.spawnProtect) {
 			// player is outside the spawn protected area
 			return event;
 		}
 
 		// if the ignoreOp is false then process the following block
-		if (!Config.ignoreOp.getBoolean()) {
+		if (!ProtectionConfig.protection.ignoreOp) {
 			// is the player in creative or an operator?
 			if (player != null && player.isCreative()) {
 				return event;
@@ -140,13 +110,13 @@ public class CommonProxy {
 			}
 		}
 
-		if (Config.allowPlaceBlock.getBoolean()) {
+		if (ProtectionConfig.interaction.allowPlaceBlock) {
 
-			if(Config.debugMode.getBoolean()) System.out.println("Allowing block placement");
+			if(ProtectionConfig.protection.debugMode) System.out.println("Allowing block placement");
 			return event;
-		} else if (!Config.allowPlaceBlock.getBoolean()) {
-			if(Config.debugMode.getBoolean()) System.out.println("Canceling block placement");
-			// after this point what we are saying is that Config.allowPlaceBlock is
+		} else if (!ProtectionConfig.interaction.allowPlaceBlock) {
+			if(ProtectionConfig.protection.debugMode) System.out.println("Canceling block placement");
+			// after this point what we are saying is that ProtectionConfig.interaction.allowPlaceBlock is
 			// false!!!
 
 			if (event.isCancelable()) {
@@ -187,21 +157,21 @@ public class CommonProxy {
 		// needed to get doors
 		PropertyBool OPEN = PropertyBool.create("open");
 
-		// if the dimension that the player is in not configured for true, this will
+		// if the dimension that the player is in not ProtectionConfigured for true, this will
 		// exit
 		// and allow them to edit the dimension spawn.
 		if(!isWorldProtected(world)) {
 			return event;
 		}
 
-		if (px > wx + Config.spawnProtection.getInt() || pz > wz + Config.spawnProtection.getInt()
-				|| px < wx - Config.spawnProtection.getInt() || pz < wz - Config.spawnProtection.getInt()) {
+		if (px > wx + ProtectionConfig.protection.spawnProtect || pz > wz + ProtectionConfig.protection.spawnProtect
+				|| px < wx - ProtectionConfig.protection.spawnProtect || pz < wz - ProtectionConfig.protection.spawnProtect) {
 			// player is outside the spawn protected area
 			return event;
 		}
 
 		// if ignoreOp is false, then process the next block
-		if (!Config.ignoreOp.getBoolean()) {
+		if (!ProtectionConfig.protection.ignoreOp) {
 
 			// is the player in creative or an operator?
 			if (player.isCreative()) {
@@ -210,9 +180,9 @@ public class CommonProxy {
 
 			// is it a real server?
 			if (server == null)
-				if(Config.debugMode.getBoolean()) player.sendMessage(str("server is null"));
+				if(ProtectionConfig.protection.debugMode) player.sendMessage(str("server is null"));
 			if (server.isSinglePlayer())
-				if(Config.debugMode.getBoolean()) player.sendMessage(str("server is singleplayer"));
+				if(ProtectionConfig.protection.debugMode) player.sendMessage(str("server is singleplayer"));
 
 			if (server != null && !server.isSinglePlayer() && player != null) {
 
@@ -230,7 +200,7 @@ public class CommonProxy {
 
 			// no left clicking!
 			if (event instanceof PlayerInteractEvent.LeftClickBlock) {
-				if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling left clicking of blocks"));
+				if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Canceling left clicking of blocks"));
 				if (event.isCancelable()) {
 					event.setCanceled(true); // don't be harvesting circuits things that are being checked for below
 					// return event;
@@ -242,11 +212,11 @@ public class CommonProxy {
 			// is it a button or lever?
 			if (block.canProvidePower()) {
 				// are you we allowed to do use them
-				if (Config.allowCircuits.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing circuits"));
+				if (ProtectionConfig.interaction.allowCircuits) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Allowing circuits"));
 					return event;
-				} else if (!Config.allowCircuits.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling circuits"));
+				} else if (!ProtectionConfig.interaction.allowCircuits) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Canceling circuits"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
 					} else {
@@ -258,11 +228,11 @@ public class CommonProxy {
 			// is the block a container?
 			if (block.hasComparatorInputOverride()) {
 				// are we allowed to use them?
-				if (Config.allowContainers.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing container access"));
+				if (ProtectionConfig.interaction.allowContainers) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Allowing container access"));
 					return event;
-				} else if (!Config.allowContainers.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling container access"));
+				} else if (!ProtectionConfig.interaction.allowContainers) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Canceling container access"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
 					} else {
@@ -275,11 +245,11 @@ public class CommonProxy {
 			if (block.getProperties().containsKey(OPEN)) {
 				// are we allowed to use doors?
 
-				if (Config.allowDoors.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing open/close"));
+				if (ProtectionConfig.interaction.allowDoors) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Allowing open/close"));
 					return event;
-				} else if (!Config.allowDoors.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling open/close"));
+				} else if (!ProtectionConfig.interaction.allowDoors) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Canceling open/close"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
 					} else {
@@ -291,11 +261,11 @@ public class CommonProxy {
 			// is it some other block?
 			if (event instanceof RightClickBlock) {
 				// are we allowed to right click other blocks?
-				if (Config.allowRightClickBlock.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing block right clicking"));
+				if (ProtectionConfig.interaction.allowRightClickBlock) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Allowing block right clicking"));
 					return event;
-				} else if (!Config.allowRightClickBlock.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling block right clicking"));
+				} else if (!ProtectionConfig.interaction.allowRightClickBlock) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Canceling block right clicking"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
 						// return event;
@@ -308,11 +278,11 @@ public class CommonProxy {
 			// is it an item in the hand?
 			if (event instanceof RightClickItem) {
 				// are we allowed to right click items in our hands?
-				if (Config.allowRightClickItem.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing item right click"));
+				if (ProtectionConfig.interaction.allowRightClickItem) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Allowing item right click"));
 					return event;
-				} else if (!Config.allowRightClickItem.getBoolean()) {
-					if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Canceling item right click"));
+				} else if (!ProtectionConfig.interaction.allowRightClickItem) {
+					if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Canceling item right click"));
 					if (event.isCancelable()) {
 						event.setCanceled(true);
 						// return event;
@@ -324,7 +294,7 @@ public class CommonProxy {
 
 			// villager?
 			if (block instanceof EntityVillager) {
-				if(Config.debugMode.getBoolean()) player.sendMessage(new TextComponentString("Allowing villager interaction"));
+				if(ProtectionConfig.protection.debugMode) player.sendMessage(new TextComponentString("Allowing villager interaction"));
 				return event;
 			}
 
@@ -349,21 +319,6 @@ public class CommonProxy {
 	
 	private static Boolean isWorldProtected(World worldIn) {
 
-		
-		switch (worldIn.provider.getDimension()) {
-
-		// overWorld
-		case 0:
-			return Config.overWorld.getBoolean();
-		// Nether
-		case -1:
-			return Config.theNether.getBoolean();
-					// The End
-		case 1:
-			return Config.theEnd.getBoolean();
-		// Some other dimensions definitely return false
-		default:
-			return false;
-		}
+		return Arrays.asList(ProtectionConfig.protection.allowedDimensions).contains(worldIn);
 	}
 }

@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.ProtectionConfig;
 import com.kreezcraft.spawnprotection.SpawnProtection;
 import net.minecraft.command.CommandBase;
 import net.minecraft.command.CommandException;
@@ -79,28 +79,24 @@ public class CommandAllow extends CommandBase {
 		}
 
 		if (action.equalsIgnoreCase("circuits")) {
-			Config.allowCircuits.set(theTruth);
+			ProtectionConfig.interaction.allowCircuits = theTruth;
 		} else if (action.equalsIgnoreCase("containers")) {
-			Config.allowContainers.set(theTruth);
+			ProtectionConfig.interaction.allowContainers = theTruth;
 		} else if (action.equalsIgnoreCase("doors")) {
-			Config.allowDoors.set(theTruth);
+			ProtectionConfig.interaction.allowDoors = theTruth;
 		} else if (action.equalsIgnoreCase("place")) {
-			Config.allowPlaceBlock.set(theTruth);
+			ProtectionConfig.interaction.allowPlaceBlock = theTruth;
 		} else if (action.equalsIgnoreCase("block")) {
-			Config.allowRightClickBlock.set(theTruth);
+			ProtectionConfig.interaction.allowRightClickBlock = theTruth;
 		} else if (action.equalsIgnoreCase("item")) {
-			Config.allowRightClickItem.set(theTruth);
+			ProtectionConfig.interaction.allowRightClickItem = theTruth;
 		}
 
+		sender.sendMessage(
+				new TextComponentString("Interaction with the actionable type of " + action + " is set to " + truth));
+		sender.sendMessage(new TextComponentString("ProtectionConfig updated"));
 
-		if (Config.cfg.hasChanged()) {
-			sender.sendMessage(new TextComponentString("Interaction with the actionable type of "+action+" is set to "+truth));
-			sender.sendMessage(new TextComponentString("config updated"));
-			Config.cfg.save();
-		} else {
-			sender.sendMessage(new TextComponentString("config not updated"));
-		}
-
+		ProtectionConfig.saveCfg();
 		return;
 	}
 

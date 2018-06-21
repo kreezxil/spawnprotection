@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.ProtectionConfig;
 import com.kreezcraft.spawnprotection.SpawnProtection;
 
 import net.minecraft.command.CommandBase;
@@ -66,17 +66,8 @@ public class CommandIgnoreOp extends CommandBase {
 		}
 
 		sender.sendMessage(new TextComponentString("Ignoring Op Priveleges is " + theTruth));
-		Config.ignoreOp.set(theTruth);
-
-		if (Config.cfg.hasChanged()) {
-			if (Config.debugMode.getBoolean()) 
-				sender.sendMessage(new TextComponentString("Config is updated"));
-			Config.cfg.save();
-		} else {
-			if (Config.debugMode.getBoolean()) 
-				sender.sendMessage(new TextComponentString("Config not updated"));
-		}
-
+		ProtectionConfig.protection.ignoreOp = theTruth;
+		ProtectionConfig.saveCfg();
 		return;
 	}
 

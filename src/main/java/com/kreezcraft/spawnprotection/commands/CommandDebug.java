@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.ProtectionConfig;
 import com.kreezcraft.spawnprotection.SpawnProtection;
 
 import net.minecraft.command.CommandBase;
@@ -67,10 +67,9 @@ public class CommandDebug extends CommandBase {
 		}
 		
 		sender.sendMessage(new TextComponentString("Debug Mode is "+theTruth));
-		Config.debugMode.set(theTruth);
-		sender.sendMessage(new TextComponentString("Config updated"));
-		Config.cfg.save();
-
+		ProtectionConfig.protection.debugMode=theTruth;
+		sender.sendMessage(new TextComponentString("ProtectionConfig updated"));
+		ProtectionConfig.saveCfg();
 		return;
 	
 	}

@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.ProtectionConfig;
 import com.kreezcraft.spawnprotection.SpawnProtection;
 
 import net.minecraft.command.CommandBase;
@@ -54,7 +54,7 @@ public class CommandRadius extends CommandBase {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		
+
 		String radius = args[0];
 
 		try {
@@ -68,12 +68,11 @@ public class CommandRadius extends CommandBase {
 			sender.sendMessage(new TextComponentString("Radius must be a whole number from 1 to infinity!"));
 			return;
 		}
-		Config.spawnProtection.set(intRadius);
-
-		Config.cfg.save();
+		ProtectionConfig.protection.spawnProtect = intRadius;
 
 		sender.sendMessage(new TextComponentString("Radius set to " + intRadius));
-		sender.sendMessage(new TextComponentString("Config updated"));
+		sender.sendMessage(new TextComponentString("ProtectionConfig updated"));
+		ProtectionConfig.saveCfg();
 		return;
 	}
 

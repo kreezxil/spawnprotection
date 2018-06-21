@@ -3,13 +3,14 @@ package com.kreezcraft.spawnprotection.commands;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.ProtectionConfig;
 import com.kreezcraft.spawnprotection.SpawnProtection;
 
 import net.minecraft.command.CommandBase;
@@ -25,9 +26,9 @@ public class CommandDimension extends CommandBase {
 	public CommandDimension() {
 		aliases = Lists.newArrayList(SpawnProtection.MODID, "sp-dim");
 	}
-	
+
 	private final List<String> aliases;
-	
+
 	@Override
 	@Nonnull
 	public String getName() {
@@ -37,7 +38,7 @@ public class CommandDimension extends CommandBase {
 	@Override
 	@Nonnull
 	public String getUsage(@Nonnull ICommandSender sender) {
-		return "/sp-dimension <end|nether|overworld> <true|false>\n" + "    determines if spawn protection is\n"
+		return "/sp-dimension <add|remove> <end|nether|overworld|id>\n" + "    determines if spawn protection is\n"
 				+ "    enabled or not for the dimension.";
 	}
 
@@ -47,6 +48,7 @@ public class CommandDimension extends CommandBase {
 		return aliases;
 	}
 
+	@SuppressWarnings("unlikely-arg-type")
 	@Override
 	public void execute(@Nonnull MinecraftServer server, @Nonnull ICommandSender sender, @Nonnull String[] args)
 			throws CommandException {
@@ -54,50 +56,44 @@ public class CommandDimension extends CommandBase {
 			sender.sendMessage(new TextComponentString(getUsage(sender)));
 			return;
 		}
-		String dim = args[0];
-		String truth = args[1];
 
-		List<String> dims = Lists.newArrayList("end", "nether", "overworld");
-		List<String> truths = Lists.newArrayList("true", "false");
+		String action = args[0];
+		String dim = args[1];
 
-		if (!dims.contains(dim)) {
-			sender.sendMessage(new TextComponentString(getUsage(sender)));
-			return;
-		}
-		if (!truths.contains(truth)) {
-			sender.sendMessage(new TextComponentString(getUsage(sender)));
-			return;
-		}
-		if (dim.equalsIgnoreCase("end")) {
-			if (truth.equalsIgnoreCase("true")) {
-				Config.theEnd.set(true);
+		int theDim = Integer.parseInt(dim);
+
+		List<String> actions = Lists.newArrayList("add", "remove");
+
+		if (dim.equals("end"))
+			theDim = 1;
+		else if (dim.equals("nether"))
+			theDim = -1;
+		else if (dim.equals("overworld"))
+			theDim = 0;
+
+		if (action.equals("add")) {
+			if (!ProtectionConfig.protection.allowedDimensions.contains(theDim)) {
+				sender.sendMessage(new TextComponentString("Dimension added to Protection List"));
+				ProtectionConfig.protection.allowedDimensions.add(theDim);
 			} else {
-				Config.theEnd.set(false);
+				sender.sendMessage(new TextComponentString("Dimension already in Protection List"));
+			}
+
+		} else if (action.equals("remove")) {
+			if (!ProtectionConfig.protection.allowedDimensions.contains(theDim)) {
+				sender.sendMessage(new TextComponentString("Dimension not in list, so you're good to go!"));
+			} else {
+				sender.sendMessage(new TextComponentString("Dimension removed from list."));
+				Iterator itr = ProtectionConfig.protection.allowedDimensions.iterator();
+				while (itr.hasNext()) {
+					int i = (Integer) itr.next();
+					if (itr.equals(theDim)) {
+						itr.remove();
+					}
+				}
 			}
 		}
-		if (dim.equalsIgnoreCase("overworld")) {
-			if (truth.equalsIgnoreCase("true")) {
-				Config.overWorld.set(true);
-			} else {
-				Config.overWorld.set(false);
-			}
-		}
-		if (dim.equalsIgnoreCase("nether")) {
-			if (truth.equalsIgnoreCase("true")) {
-				Config.theNether.set(true);
-			} else {
-				Config.theNether.set(false);
-			}
-		}
-
-		if(Config.cfg.hasChanged()) {
-			sender.sendMessage(new TextComponentString("Protection of "+dim+" set to "+truth));
-			sender.sendMessage(new TextComponentString("Config updated"));
-			Config.cfg.save();
-		} else {
-			sender.sendMessage(new TextComponentString("Config not updated"));
-		}
-
+		ProtectionConfig.saveCfg();
 		return;
 	}
 
@@ -110,8 +106,8 @@ public class CommandDimension extends CommandBase {
 
 	@Override
 	public boolean checkPermission(MinecraftServer server, ICommandSender sender) {
-		if(server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
-			return true; //ops can use the command
+		if (server.getPlayerList().getOppedPlayers().getGameProfileFromName(sender.getName()) != null) {
+			return true; // ops can use the command
 		}
 		return false;
 	}

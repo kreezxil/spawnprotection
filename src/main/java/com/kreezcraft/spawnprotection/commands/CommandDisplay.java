@@ -8,7 +8,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 import com.google.common.collect.Lists;
-import com.kreezcraft.spawnprotection.Config;
+import com.kreezcraft.spawnprotection.ProtectionConfig;
 import com.kreezcraft.spawnprotection.SpawnProtection;
 
 import net.minecraft.command.CommandBase;
@@ -19,6 +19,7 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.DimensionType;
 
 public class CommandDisplay extends CommandBase {
 
@@ -37,7 +38,7 @@ public class CommandDisplay extends CommandBase {
 	@Override
 	@Nonnull
 	public String getUsage(@Nonnull ICommandSender sender) {
-		return "/sp-display <all|worlds|protection|interaction>\n    show the config or parts thereof";
+		return "/sp-display <all|worlds|protection|interaction>\n    show the ProtectionConfig or parts thereof";
 	}
 
 	@Override
@@ -51,32 +52,41 @@ public class CommandDisplay extends CommandBase {
 	}
 
 	private void showWorlds(ICommandSender sender) {
+		
+		DimensionType dimension = null;
+		
 		printMsg(sender, "Worlds Spawn Protection");
 		printMsg(sender, "=======================");
-		printMsg(sender, "OverWorld: " + Config.overWorld.getBoolean());
-		printMsg(sender, "Nether: " + Config.theNether.getBoolean());
-		printMsg(sender, "TheEnd: " + Config.theEnd.getBoolean());
+		for (int dim : ProtectionConfig.protection.allowedDimensions ) {
+			try {
+				if(dimension.getById(dim)!=null) {
+					printMsg(sender, dimension.getById(dim).getName() + ": enabled");
+				}
+			} catch(Exception e) {
+				printMsg(sender, dim + " : does not exist!");
+			}
+		}
 		printMsg(sender, " ");
 	}
 
 	private void showProtection(ICommandSender sender) {
 		printMsg(sender, "Spawn Protection");
 		printMsg(sender, "================");
-		printMsg(sender, "Radius: " + Config.spawnProtection.getInt());
-		printMsg(sender, "Debug Mode: " + Config.debugMode.getBoolean());
-		printMsg(sender, "Ignore Ops: " + Config.ignoreOp.getBoolean());
+		printMsg(sender, "Radius: " + ProtectionConfig.protection.spawnProtect);
+		printMsg(sender, "Debug Mode: " + ProtectionConfig.protection.debugMode);
+		printMsg(sender, "Ignore Ops: " + ProtectionConfig.protection.ignoreOp);
 		printMsg(sender, " ");
 	}
 
 	private void showInteractions(ICommandSender sender) {
 		printMsg(sender, "Interaction Control");
 		printMsg(sender, "===================");
-		printMsg(sender, "Circuits: " + Config.allowCircuits.getBoolean());
-		printMsg(sender, "Containers: " + Config.allowContainers.getBoolean());
-		printMsg(sender, "Doors: " + Config.allowDoors.getBoolean());
-		printMsg(sender, "Place Blocks: " + Config.allowPlaceBlock.getBoolean());
-		printMsg(sender, "RightClickBlocks: " + Config.allowRightClickBlock.getBoolean());
-		printMsg(sender, "RightClickItems: " + Config.allowRightClickItem.getBoolean());
+		printMsg(sender, "Circuits: " + ProtectionConfig.interaction.allowCircuits);
+		printMsg(sender, "Containers: " + ProtectionConfig.interaction.allowContainers);
+		printMsg(sender, "Doors: " + ProtectionConfig.interaction.allowDoors);
+		printMsg(sender, "Place Blocks: " + ProtectionConfig.interaction.allowPlaceBlock);
+		printMsg(sender, "RightClickBlocks: " + ProtectionConfig.interaction.allowRightClickBlock);
+		printMsg(sender, "RightClickItems: " + ProtectionConfig.interaction.allowRightClickItem);
 		printMsg(sender, " ");
 	}
 
